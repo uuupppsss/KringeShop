@@ -1,20 +1,46 @@
 ﻿//я умная, правда :(
 using Microsoft.AspNetCore.SignalR;
+using KringeShopLib.Model;
 
 namespace KringeShopApi
 {
     public class SellingHub:Hub
     {
-        public async Task OrderCreated()
+
+        public async Task OrderCreated(Order order)
         {
-            //очень крутой код
+            //пользователь создал заказ
         }
 
-        public async Task ProductOrdered()
+        public async Task ProductOrdered(Product product)
         {
-            //второй очень крутой код
+            //единица товара заказана
         }
 
+        public async Task OrderInAssembly()
+        {
+            //заказ в сборке
+        }
+
+        public async Task OrderSent()
+        {
+            //заказ отправлен
+        }
+
+        public async Task OrderOnTheWay()
+        {
+            //заказ в пути
+        }
+
+        public async Task OrderIsReadyToRecieve()
+        {
+            //заказ готов к получению
+        }
+
+        public async Task OrderRecieved()
+        {
+            //заказ получен
+        }
 
     }
 }
