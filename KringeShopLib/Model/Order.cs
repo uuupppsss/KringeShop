@@ -17,6 +17,10 @@ public partial class Order
 
     public int StatusId { get; set; }
 
+    public DateTime? CreateDate { get; set; }
+
+    public bool IsCmpleted { get; set; }
+
     public virtual ICollection<ProductsInOrderList> ProductsInOrderLists { get; set; } = new List<ProductsInOrderList>();
 
     public virtual OrderStatus Status { get; set; } = null!;

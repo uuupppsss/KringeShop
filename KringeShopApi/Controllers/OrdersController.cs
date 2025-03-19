@@ -25,7 +25,11 @@ namespace KringeShopApi.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Order>>> GetOrders()
         {
-            return Ok(await _context.Orders.ToListAsync());
+            var orders = await _context.Orders.ToListAsync();
+
+            //сортировка по дате заказа
+            var result = orders.OrderByDescending(o => o.CreateDate);
+            return Ok(result);
         }
 
         // GET: api/Orders/5
@@ -39,6 +43,7 @@ namespace KringeShopApi.Controllers
                 return NotFound();
             }
 
+            
             return Ok(order);
         }
 

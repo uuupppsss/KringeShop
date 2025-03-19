@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using KringeShopLib.Model;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace KringeShopApi.Model;
 
@@ -36,8 +36,7 @@ public partial class KrinageShopDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=192.168.200.13;user=student;password=student;database=KrinageShopDB", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.3.39-mariadb"));
-
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -92,6 +91,7 @@ public partial class KrinageShopDbContext : DbContext
                 .HasMaxLength(255)
                 .HasDefaultValueSql("' '")
                 .HasColumnName("adress");
+            entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.FullCost).HasPrecision(19, 2);
             entity.Property(e => e.RecieveDate).HasColumnType("datetime");
             entity.Property(e => e.StatusId)
