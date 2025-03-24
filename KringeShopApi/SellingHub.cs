@@ -6,6 +6,10 @@ namespace KringeShopApi
 {
     public class SellingHub:Hub
     {
+        public override Task OnConnectedAsync()
+        {
+            return base.OnConnectedAsync(); 
+        }
 
         public async Task OrderCreated(Order order)
         {
@@ -41,6 +45,8 @@ namespace KringeShopApi
         {
             //заказ получен
         }
+        
+
 
     }
 }

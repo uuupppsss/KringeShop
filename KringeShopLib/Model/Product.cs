@@ -15,7 +15,9 @@ public partial class Product
 
     public decimal Price { get; set; }
 
-    public string Count { get; set; } = null!;
+    public int Count { get; set; }
+
+    public int TimeBought { get; set; }
 
     public virtual ICollection<Basket> Baskets { get; set; } = new List<Basket>();
 
