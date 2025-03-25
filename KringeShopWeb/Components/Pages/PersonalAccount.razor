@@ -1,0 +1,25 @@
+﻿@page "/Account"
+@rendermode InteractiveServer
+
+@using KringeShopWeb.Services;
+
+@inject UserService userservice;
+
+<h3>Личный кабинет</h3>
+
+@if(userservice.CurrentUser==null)
+{
+    <div>
+        <button>Войти</button>
+        <h3>Ещё нет аккаунта?</h3>
+        <button>Зарегистрироваться</button>
+    </div>
+}
+else
+{
+    
+}
+
+@code {
+
+}

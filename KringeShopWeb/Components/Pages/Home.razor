@@ -1,7 +1,10 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@inject NavigationManager nav;
+
 @using KringeShopLib.Model
+
+@inject NavigationManager nav;
+
 <PageTitle>Home</PageTitle>
 
 <h3>Список товаров</h3>
@@ -22,11 +25,6 @@
             <button @onclick="() => AddToCart(product)">Добавить в корзину</button>
         </div>
     }
-</div>
-
-<div>
-    <button @onclick="GoToCart">Корзина</button>
-    <button @onclick="GoToLogin">Личный кабинет</button>
 </div>
 
 <style>
@@ -50,6 +48,7 @@
             margin-top: 10px;
         }
 </style>
+
 
 @code {
     private string filter = string.Empty;
@@ -80,15 +79,6 @@
 
     }
 
-    public void GoToCart()
-    {
-        nav.NavigateTo("/Basket");
-    }
-
-    private void GoToLogin()
-    {
-        
-    }
 
     private List<Product> GetProducts()
     {
