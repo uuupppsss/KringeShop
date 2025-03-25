@@ -1,11 +1,104 @@
 ﻿@page "/"
-
+@rendermode InteractiveServer
+@inject NavigationManager nav;
+@using KringeShopLib.Model
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h3>Список товаров</h3>
 
-Welcome to your new app.
-@code
-{
+<div>
+    <div>
+        <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
+        <button @onclick="FilterProducts">Применить фильтр</button>
+    </div>
+</div>
 
+<div class="product-list">
+    @foreach (var product in filteredProducts)
+    {
+        <div class="product-item">
+            <h4>@product.Name</h4>
+            <p>Цена: @product.Price.ToString("C")</p>
+            <button @onclick="() => AddToCart(product)">Добавить в корзину</button>
+        </div>
+    }
+</div>
+
+<div>
+    <button @onclick="GoToCart">Корзина</button>
+    <button @onclick="GoToLogin">Личный кабинет</button>
+</div>
+
+<style>
+    .product-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .product-item {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        width: calc(33% - 20px);
+    }
+
+        .product-item h4 {
+            margin: 0;
+        }
+
+        .product-item button {
+            margin-top: 10px;
+        }
+</style>
+
+@code {
+    private string filter = string.Empty;
+    private List<Product> products = new List<Product>(); 
+    private List<Product> filteredProducts;
+
+    protected override void OnInitialized()
+    {
+
+        products = GetProducts(); 
+        filteredProducts = products;
+    }
+
+    private void FilterProducts()
+    {
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            filteredProducts = products;
+        }
+        else
+        {
+            filteredProducts = products.Where(p => p.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    private void AddToCart(Product product)
+    {
+
+    }
+
+    public void GoToCart()
+    {
+        nav.NavigateTo("/Basket");
+    }
+
+    private void GoToLogin()
+    {
+        
+    }
+
+    private List<Product> GetProducts()
+    {
+        // Здесь вернуть список товаров из источника данных
+        return new List<Product>
+        {
+            new Product { Id = 1, Name = "Товар 1", Price = 100 },
+            new Product { Id = 2, Name = "Товар 2", Price = 150 },
+            new Product { Id = 3, Name = "Товар 3", Price = 200 },
+            
+        };
+    }
 }
