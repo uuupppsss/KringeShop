@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
+using Microsoft.AspNetCore.SignalR;
 
 namespace KringeShopApi.Controllers
 {
@@ -79,6 +80,7 @@ namespace KringeShopApi.Controllers
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+           // await _hubContext.SignUserIn(user);
 
             if (await _context.Users.ContainsAsync(user)) return Ok();
             else return BadRequest("Что-то пошло не так");

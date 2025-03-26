@@ -1,24 +1,31 @@
 ﻿//я умная, правда :(
 using Microsoft.AspNetCore.SignalR;
 using KringeShopLib.Model;
+using KringeShopApi.Model;
 
 namespace KringeShopApi
 {
     public class SellingHub:Hub
     {
-        public override Task OnConnectedAsync()
+        private KrinageShopDbContext _context;
+        public SellingHub(KrinageShopDbContext context)
         {
-            return base.OnConnectedAsync(); 
+            _context = context;
+        }
+
+        public async Task SignUserIn(User user)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, user.Role.Title);
         }
 
         public async Task OrderCreated(Order order)
         {
-            //пользователь создал заказ
+            await Clients.Group("admin").SendAsync("Ordercreated", order);
         }
 
         public async Task ProductOrdered(Product product)
         {
-            //единица товара заказана
+            await Clients.All.SendAsync("ProductOrdered", product.Id);
         }
 
         public async Task OrderInAssembly()
