@@ -1,7 +1,8 @@
 ﻿@page "/"
+
 @rendermode InteractiveServer
 
-@using KringeShopWeb.Services
+@using KringeShopWebClient.Services
 @using KringeShopLib.Model
 
 @inject NavigationManager nav;
@@ -14,7 +15,7 @@
 <div>
     <div>
         <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
-        
+
         <button @onclick="FilterProducts">
             <i class="bi bi-search"></i>
         </button>
@@ -22,7 +23,7 @@
 </div>
 
 <div class="product-list">
-    @if(filteredProducts.Count==0)
+    @if (filteredProducts.Count == 0)
     {
         <h3>Ничего не нашлось</h3>
     }
@@ -31,16 +32,17 @@
         @foreach (var product in filteredProducts)
         {
             <div class="product-item">
+                <img />
                 <h4>@product.Name</h4>
                 <p>Цена: @product.Price.ToString("C")</p>
-                @if(userservice.CurrentUser!=null)
+                @if (userservice.CurrentUser != null)
                 {
                     <button @onclick="() => AddToBasket(product)">Добавить в корзину</button>
                 }
             </div>
         }
     }
-    
+
 </div>
 
 @code {

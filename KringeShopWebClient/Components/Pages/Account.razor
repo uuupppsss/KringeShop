@@ -1,7 +1,7 @@
 ﻿@page "/Account"
 @rendermode InteractiveServer
 
-@using KringeShopWeb.Services;
+@using KringeShopWebClient.Services;
 @using KringeShopLib.Model
 
 @inject NavigationManager nav;
@@ -14,7 +14,7 @@
     <div>
         <button @onclick="SignIn">Войти</button>
         <p>Ещё нет аккаунта?</p>
-        <button>Зарегистрироваться</button>
+        <button @onclick="SignUp">Зарегистрироваться</button>
     </div>
 }
 else
@@ -29,6 +29,11 @@ else
 
     private void SignIn()
     {
-        nav.NavigateTo("/SignIn");
+        nav.NavigateTo("SignIn");
+    }
+
+    private void SignUp()
+    {
+        nav.NavigateTo("SignUp");
     }
 }

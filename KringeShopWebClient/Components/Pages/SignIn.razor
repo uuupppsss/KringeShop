@@ -1,0 +1,35 @@
+﻿@page "/SignIn"
+@rendermode InteractiveServer
+
+@using KringeShopWebClient.Services;
+@using KringeShopLib.Model
+
+@inject NavigationManager nav;
+@inject UserService userservice;
+
+<h3>Авторизация</h3>
+
+<div>
+    <p>Логин</p>
+    <input type="text" />
+    <p>Пароль</p>
+    <input type="password" />
+    <button @onclick="SignInMethod">Войти</button>
+    <p>Ещё нет аккаунта?</p>
+    <button @onclick="SignUpMethod">Зарегистрироваться</button>
+
+</div>
+
+
+@code {
+
+    private void SignUpMethod()
+    {
+        nav.NavigateTo("/SignUp");
+    }
+
+    private void SignInMethod()
+    {
+
+    }
+}

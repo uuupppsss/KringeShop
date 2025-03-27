@@ -1,8 +1,7 @@
-using KringeShopWeb.Components;
-using KringeShopWeb.Services;
-using Microsoft.AspNetCore.Components;
+using KringeShopWebClient.Components;
+using KringeShopWebClient.Services;
 
-namespace KringeShopWeb
+namespace KringeShopWebClient
 {
     public class Program
     {
