@@ -7,17 +7,17 @@
 
 <h3>Личный кабинет</h3>
 
-@if(userservice.CurrentUser==null)
+@if (userservice.CurrentUser == null)
 {
     <div>
         <button>Войти</button>
-        <h3>Ещё нет аккаунта?</h3>
+        <p>Ещё нет аккаунта?</p>
         <button>Зарегистрироваться</button>
     </div>
 }
 else
 {
-    
+
 }
 
 @code {

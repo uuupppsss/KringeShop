@@ -1,0 +1,45 @@
+﻿button {
+    background-color: #f8d1e0;
+    color: brown;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    button:hover {
+        background-color: #f4a6c0;
+        transform: scale(1.05);
+    }
+
+    button:active {
+        background-color: #f28eab;
+        transform: scale(0.95);
+    }
+
+    button:disabled {
+        background-color: #e0b2c7;
+        color: #a0a0a0;
+        cursor: not-allowed;
+    }
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: calc(33% - 20px);
+}
+
+    .product-item h4 {
+        margin: 0;
+    }
+
+    .product-item button {
+        margin-top: 10px;
+    }

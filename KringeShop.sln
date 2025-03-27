@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopApi", "KringeShop
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopLib", "KringeShopLib\KringeShopLib.csproj", "{33B3ACED-BB98-4710-BB39-27B6D839918A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopWeb", "KringeShopWeb\KringeShopWeb.csproj", "{D9515576-7C51-42EF-8B09-2CD80E387032}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KringeShopWeb", "KringeShopWeb\KringeShopWeb.csproj", "{DE3E6E7A-EB73-452B-BB57-ECC3464E1A7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{33B3ACED-BB98-4710-BB39-27B6D839918A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33B3ACED-BB98-4710-BB39-27B6D839918A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33B3ACED-BB98-4710-BB39-27B6D839918A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9515576-7C51-42EF-8B09-2CD80E387032}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9515576-7C51-42EF-8B09-2CD80E387032}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9515576-7C51-42EF-8B09-2CD80E387032}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9515576-7C51-42EF-8B09-2CD80E387032}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE3E6E7A-EB73-452B-BB57-ECC3464E1A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE3E6E7A-EB73-452B-BB57-ECC3464E1A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE3E6E7A-EB73-452B-BB57-ECC3464E1A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE3E6E7A-EB73-452B-BB57-ECC3464E1A7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

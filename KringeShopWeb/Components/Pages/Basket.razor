@@ -1,11 +1,22 @@
 ﻿@page "/Basket"
 @rendermode InteractiveServer
 
+@using KringeShopWeb.Services;
+
+@inject UserService userservice;
 @using KringeShopLib.Model
 
-<PageTitle>Home</PageTitle>
-
 <h3>Корзина товаров</h3>
-
-
-
+@if(userservice.CurrentUser==null)
+{
+    <p>Для перехода в корзину товаров необходимо войти в учетную запись</p>
+    <div>
+        <button>Войти</button>
+        <p>Ещё нет аккаунта?</p>
+        <button>Зарегистрироваться</button>
+    </div>
+}
+else
+{
+    
+}
