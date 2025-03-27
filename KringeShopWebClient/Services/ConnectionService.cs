@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using KringeShopLib.Model;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace KringeShopWebClient.Services
 {
@@ -15,6 +16,23 @@ namespace KringeShopWebClient.Services
             {
                 BaseAddress = new Uri("http://localhost:5216/api")
             };
+        }
+
+        public async Task<List<Product>> GetProducsList()
+        {
+            try
+            {
+                var responce = await client.GetAsync("Products");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                else return await responce.Content.ReadFromJsonAsync<List<Product>>();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }
