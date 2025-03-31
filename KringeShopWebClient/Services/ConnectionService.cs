@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using System.Text;
 using System.Text.Json;
 using KringeShopWebClient.Model;
+using KringeShopWebClient.Extention;
 
 namespace KringeShopWebClient.Services
 {
