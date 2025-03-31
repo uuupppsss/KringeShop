@@ -17,10 +17,15 @@ namespace KringeShopApi
         //    return base.OnConnectedAsync();
         //}
 
-        private async void ConnectSignedUpUser(string username)
+        private async void ConnectClient(string username)
         {
             //string name = Context.User.Identity.Name;
-            await Groups.AddToGroupAsync(Context.ConnectionId, username);
+            if (!string.IsNullOrEmpty(username))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, username);
+            }
+            await Groups.AddToGroupAsync(Context.ConnectionId, "user");
+
         }
 
         public async Task NewClientSignedUp()

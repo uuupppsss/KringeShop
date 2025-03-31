@@ -9,7 +9,7 @@ public partial class Order
 
     public int UserId { get; set; }
 
-    public string Adress { get; set; } = null!;
+    public string? Adress { get; set; }
 
     public decimal FullCost { get; set; }
 
@@ -21,7 +21,7 @@ public partial class Order
 
     public bool IsCmpleted { get; set; }
 
-    public virtual ICollection<ProductsInOrderList> ProductsInOrderLists { get; set; } = new List<ProductsInOrderList>();
+    public bool IsSelfPickUp { get; set; }
 
     public virtual OrderStatus Status { get; set; } = null!;
 

@@ -12,6 +12,12 @@ namespace KringeShopApi
         {
             _context = context;
         }
+        public async Task ConnectAdmin(string username)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, username);
+            await Groups.AddToGroupAsync(Context.ConnectionId, "admin");
+        }
+
         public async Task OrderStatusChanged(int order_id)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o=> o.Id==order_id);

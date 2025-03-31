@@ -13,9 +13,11 @@ public partial class User
 
     public int RoleId { get; set; }
 
-    public virtual ICollection<Basket> Baskets { get; set; } = new List<Basket>();
+    public virtual ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual UserRole Role { get; set; } = null!;
+
+    public virtual ICollection<SavedProduct> SavedProducts { get; set; } = new List<SavedProduct>();
 }

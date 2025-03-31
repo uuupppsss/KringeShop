@@ -5,7 +5,7 @@ using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using KringeShopLib.Model;
 
 namespace KringeShopApi.Model;
-
+//scaffold-dbcontext "server=192.168.200.13;user=student;password=student;database=KrinageShopDB" Pomelo.EntityFrameworkCore.MySql -out model -f
 public partial class KrinageShopDbContext : DbContext
 {
     public KrinageShopDbContext()
@@ -17,7 +17,7 @@ public partial class KrinageShopDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Basket> Baskets { get; set; }
+    public virtual DbSet<BasketItem> BasketItems { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
@@ -27,7 +27,7 @@ public partial class KrinageShopDbContext : DbContext
 
     public virtual DbSet<ProductType> ProductTypes { get; set; }
 
-    public virtual DbSet<ProductsInOrderList> ProductsInOrderLists { get; set; }
+    public virtual DbSet<SavedProduct> SavedProducts { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -37,18 +37,17 @@ public partial class KrinageShopDbContext : DbContext
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=192.168.200.13;user=student;password=student;database=KrinageShopDB", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.3.39-mariadb"));
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
             .UseCollation("utf8mb4_general_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<Basket>(entity =>
+        modelBuilder.Entity<BasketItem>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Basket");
+            entity.ToTable("BasketItem");
 
             entity.HasIndex(e => e.ProductId, "FK_Basket_Product_id");
 
@@ -57,6 +56,9 @@ public partial class KrinageShopDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.Count)
+                .HasColumnType("int(11)")
+                .HasColumnName("count");
             entity.Property(e => e.ProductId)
                 .HasColumnType("int(11)")
                 .HasColumnName("product_id");
@@ -64,12 +66,12 @@ public partial class KrinageShopDbContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("user_id");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.Baskets)
+            entity.HasOne(d => d.Product).WithMany(p => p.BasketItems)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Basket_Product_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Baskets)
+            entity.HasOne(d => d.User).WithMany(p => p.BasketItems)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Basket_User_id");
@@ -163,33 +165,31 @@ public partial class KrinageShopDbContext : DbContext
                 .HasDefaultValueSql("' '");
         });
 
-        modelBuilder.Entity<ProductsInOrderList>(entity =>
+        modelBuilder.Entity<SavedProduct>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("ProductsInOrderList");
+            entity.HasIndex(e => e.ProductId, "FK_SavedProducts_Product_id");
 
-            entity.HasIndex(e => e.OrderId, "FK_ProductsInOrderList_Order_id");
-
-            entity.HasIndex(e => e.ProductId, "FK_ProductsInOrderList_Product_id");
+            entity.HasIndex(e => e.UserId, "FK_SavedProducts_User_id");
 
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
-            entity.Property(e => e.OrderId)
-                .HasColumnType("int(11)")
-                .HasColumnName("order_id");
             entity.Property(e => e.ProductId)
                 .HasColumnType("int(11)")
                 .HasColumnName("product_id");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.ProductsInOrderLists)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_ProductsInOrderList_Order_id");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ProductsInOrderLists)
+            entity.HasOne(d => d.Product).WithMany(p => p.SavedProducts)
                 .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK_ProductsInOrderList_Product_id");
+                .HasConstraintName("FK_SavedProducts_Product_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.SavedProducts)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_SavedProducts_User_id");
         });
 
         modelBuilder.Entity<User>(entity =>
