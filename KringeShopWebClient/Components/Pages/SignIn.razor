@@ -5,31 +5,39 @@
 @using KringeShopLib.Model
 
 @inject NavigationManager nav;
-@inject UserService userservice;
+@inject ConnectionService connection;
 
 <h3>Авторизация</h3>
 
 <div>
-    <p>Логин</p>
-    <input type="text" />
-    <p>Пароль</p>
-    <input type="password" />
-    <button @onclick="SignInMethod">Войти</button>
-    <p>Ещё нет аккаунта?</p>
-    <button @onclick="SignUpMethod">Зарегистрироваться</button>
+    <div class="login-container">
+        <h2>Вход в систему</h2>
+        <p>Логин</p>
+        <input type="text" class="input-field" @bind-value="username"/>
+
+        <p>Пароль</p>
+        <input type="password" class="input-field" @bind-value="pwd"/>
+
+        <button @onclick="SignInMethod" class="btn">Войти</button>
+
+        <p>Ещё нет аккаунта?</p>
+        <button @onclick="SignUpMethod" class="btn">Зарегистрироваться</button>
+    </div>
 
 </div>
 
 
 @code {
+    private string pwd;
+    private string username;
 
     private void SignUpMethod()
     {
         nav.NavigateTo("/SignUp");
     }
 
-    private void SignInMethod()
+    private async void SignInMethod()
     {
-
+        await connection.SignIn(username, pwd);
     }
 }

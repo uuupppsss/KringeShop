@@ -11,12 +11,15 @@
 <h3>Корзина товаров</h3>
 @if (userservice.CurrentUser == null)
 {
-    <p>Для перехода в корзину товаров необходимо войти в учётную запись</p>
-    <div>
-        <button @onclick="SignIn">Войти</button>
-        <p>Ещё нет аккаунта?</p>
-        <button @onclick="SignUp">Зарегистрироваться</button>
+    <div class="center-container">
+        <div class="auth-container">
+            <p>Для перехода в корзину товаров необходимо войти в учётную запись</p>
+            <button @onclick="SignIn">Войти</button>
+            <p>Ещё нет аккаунта?</p>
+            <button @onclick="SignUp">Зарегистрироваться</button>
+        </div>
     </div>
+
 }
 else
 {

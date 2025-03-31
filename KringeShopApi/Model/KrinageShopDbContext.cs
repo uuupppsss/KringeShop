@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
-
-namespace KringeShopApi.model;
+using KringeShopLib.Model;
+namespace KringeShopApi.Model;
 
 public partial class KrinageShopDbContext : DbContext
 {

@@ -3,37 +3,69 @@
 
 @using KringeShopWebClient.Services;
 @using KringeShopLib.Model
+@using KringeShopWebClient.Extention
 
+@inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
-@inject UserService userservice;
+@inject ConnectionService connection;
 
 <h3>Регистрация</h3>
 
-<div>
+<div class="login-container">
+    <h2>Регистрация</h2>
+    <p>Почта</p>
+    <input type="text" class="input-field" @bind-value="email"/>
+    <p>Контактный телефон</p>
+    <input type="text" class="input-field" @bind-value="phone"/>
     <p>Логин</p>
-    <input type="text" />
+    <input type="text" class="input-field" @bind-value="username"/>
+
     <p>Пароль</p>
-    <input type="password" />
+    <input type="password" class="input-field" @bind-value="pwd"/>
+
     <p>Повторите пароль</p>
-    <input type="password" />
-    <div style="margin: 10px">
-            <button @onclick="SignUpMethod">Регистрация</button>
-            <p>Уже есть аккаунт?</p>
-            <button @onclick="SignInMethod">Войти</button>
-    </div>
+    <input type="password" class="input-field" @bind-value="repeat_pwd"/>
+    <button @onclick="SignUpMethod" class="btn">Зарегистрироваться</button>
+    <p>Уже есть аккаунт?</p>
+    <button @onclick="SignInMethod" class="btn">Войти</button>
+
 
 </div>
 
 
+
 @code {
+    private string pwd;
+    private string repeat_pwd;
+    private string username;
+    private string email;
+    private string phone;
 
     private void SignInMethod()
     {
         nav.NavigateTo("/SignIn");
     }
 
-    private void SignUpMethod()
+    private async void SignUpMethod()
     {
-
+        if (new[] { repeat_pwd, pwd, username, email, phone }
+            .All(s => !string.IsNullOrEmpty(s)))
+        {
+            if (pwd == repeat_pwd)
+            {
+                await connection.SignUp(new User
+                {
+                    Username=username,
+                    Password=pwd,
+                    Email=email,
+                    ContactPhone=phone
+                });
+                if(connection.CurrentOperationResult.IsSuccess) 
+                    await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
+                else await jsruntime.ToastrError(connection.CurrentOperationResult.Message);
+            }
+            else await jsruntime.ToastrError("Пароли не совпадают");
+        }
+        else await jsruntime.ToastrError("Заполните все поля");
     }
 }

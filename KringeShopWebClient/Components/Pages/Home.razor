@@ -4,11 +4,13 @@
 
 @using KringeShopWebClient.Services
 @using KringeShopLib.Model
-@using Blazored.Toast
+@using KringeShopWebClient.Extention
 
+@inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
 @inject UserService userservice;
-@* @inject Blazored.Toast.Services.IToastService ToastService *@
+@inject ConnectionService connectionService;
+@* @inject NotifyService notifyService; *@
 
 <PageTitle>Home</PageTitle>
 
@@ -17,6 +19,7 @@
 
 <div>
     <div>
+        <button @onclick="TestToast">Нажми</button>
         <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
 
         <button @onclick="FilterProducts">
@@ -29,7 +32,6 @@
     @if (filteredProducts.Count == 0)
     {
         <h3>Ничего не нашлось</h3>
-        <button @onclick="ShowToast">Не нажимай</button>
     }
     else
     {
@@ -54,9 +56,19 @@
     private List<Product> products = new List<Product>();
     private List<Product> filteredProducts;
 
-    private void ShowToast()
+    private async void ShowSuccessMessage(string message)
     {
-        //ToastService.ShowSuccess(":(");
+        await jsruntime.ToastrSuccess(message);
+    }
+
+    private async void ShowErrorMessage(string message)
+    {
+        await jsruntime.ToastrError(message);
+    }
+
+    private async void TestToast()
+    {
+        await jsruntime.ToastrSuccess("Оао ммм)");
     }
 
     protected override void OnInitialized()
@@ -64,6 +76,9 @@
 
         products = GetProducts();
         filteredProducts = products;
+
+        // notifyService.OnNotifySuccess += ShowSuccessMessage;
+        // notifyService.OnNotifyError += ShowErrorMessage;
     }
 
     private void FilterProducts()
@@ -94,5 +109,7 @@
             new Product { Id = 3, Name = "Товар 3", Price = 200 },
 
         };
+
+        
     }
 }

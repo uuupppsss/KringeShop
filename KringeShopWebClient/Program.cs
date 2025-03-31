@@ -1,6 +1,6 @@
-using Blazored.Toast;
 using KringeShopWebClient.Components;
 using KringeShopWebClient.Services;
+using Microsoft.JSInterop;
 
 namespace KringeShopWebClient
 {
@@ -16,7 +16,9 @@ namespace KringeShopWebClient
 
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<ConnectionService>();
+            //builder.Services.AddSingleton<NotifyService>();
             //builder.Services.AddBlazoredToast();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
