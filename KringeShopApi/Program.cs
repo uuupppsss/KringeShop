@@ -27,5 +27,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<SellingHub>("/sellinghub");
+//app.MapHub<SellingHub>("/sellinghub");
+app.MapHub<ClientsHub>("/clientshub");
+app.MapHub<AdminsHub>("/adminshub");
 app.Run();
