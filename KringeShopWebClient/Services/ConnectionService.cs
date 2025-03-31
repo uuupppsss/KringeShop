@@ -53,7 +53,7 @@ namespace KringeShopWebClient.Services
             try
             {
                 string json=JsonSerializer.Serialize(productsList);
-                var responce = await client.PostAsync("Products", new StringContent(json, Encoding.UTF8, "application/json"));
+                var responce = await client.PostAsync("Orders", new StringContent(json, Encoding.UTF8, "application/json"));
                 if (!responce.IsSuccessStatusCode)
                 {
 
@@ -67,6 +67,7 @@ namespace KringeShopWebClient.Services
 
         public async Task SignUp(User user)
         {
+            User current_user= null;
             try
             {
                 string json = JsonSerializer.Serialize(user);
@@ -75,7 +76,8 @@ namespace KringeShopWebClient.Services
                 {
 
                 }
-                //else userService.CurrentUser= await responce.Content.ReadFromJsonAsync<User>();
+                else current_user=await responce.Content.ReadFromJsonAsync<User>();
+                userService.SetCurrentUser(current_user);
 
             }
             catch (Exception ex)
@@ -84,9 +86,23 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task SignIn(User user)
+        public async Task SignIn(string username, string password)
         {
+            User current_user = null;
+            try
+            {
+                var responce = await client.GetAsync($"Users/SignIn/{username}/{password}");
+                if (!responce.IsSuccessStatusCode)
+                {
 
+                }
+                else current_user = await responce.Content.ReadFromJsonAsync<User>();
+                userService.SetCurrentUser(current_user);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }

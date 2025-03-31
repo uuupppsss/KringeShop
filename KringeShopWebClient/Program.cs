@@ -16,7 +16,7 @@ namespace KringeShopWebClient
 
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<ConnectionService>();
-            builder.Services.AddBlazoredToast();
+            //builder.Services.AddBlazoredToast();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

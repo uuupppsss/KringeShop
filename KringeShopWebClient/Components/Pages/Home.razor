@@ -8,7 +8,7 @@
 
 @inject NavigationManager nav;
 @inject UserService userservice;
-@inject Blazored.Toast.Services.IToastService ToastService
+@* @inject Blazored.Toast.Services.IToastService ToastService *@
 
 <PageTitle>Home</PageTitle>
 
@@ -56,7 +56,7 @@
 
     private void ShowToast()
     {
-        ToastService.ShowSuccess(":(");
+        //ToastService.ShowSuccess(":(");
     }
 
     protected override void OnInitialized()

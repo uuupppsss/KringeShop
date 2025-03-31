@@ -76,7 +76,7 @@ namespace KringeShopApi.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostUser(User user)
+        public async Task<ActionResult> SignUp(User user)
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -84,6 +84,15 @@ namespace KringeShopApi.Controllers
 
             if (await _context.Users.ContainsAsync(user)) return Ok();
             else return BadRequest("Что-то пошло не так");
+        }
+
+        [HttpGet("SignIn/{username}/{password}")]
+        public async Task<ActionResult<User>> SignIn(string password, string username)
+        {
+            var found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (found_user == null) return NotFound("Пользователь с тким именем не найден");
+            if (found_user.Password != password) return BadRequest("Пароль не верный");
+            else return Ok(found_user);
         }
 
         // DELETE: api/Users/5
