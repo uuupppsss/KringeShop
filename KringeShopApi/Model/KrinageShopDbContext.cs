@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
-using KringeShopLib.Model;
 
-namespace KringeShopApi.Model;
-//scaffold-dbcontext "server=192.168.200.13;user=student;password=student;database=KrinageShopDB" Pomelo.EntityFrameworkCore.MySql -out model -f
+namespace KringeShopApi.model;
+
 public partial class KrinageShopDbContext : DbContext
 {
     public KrinageShopDbContext()
@@ -56,6 +55,9 @@ public partial class KrinageShopDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.Cost)
+                .HasPrecision(19, 2)
+                .HasColumnName("cost");
             entity.Property(e => e.Count)
                 .HasColumnType("int(11)")
                 .HasColumnName("count");
@@ -203,6 +205,12 @@ public partial class KrinageShopDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.ContactPhone)
+                .HasMaxLength(255)
+                .HasDefaultValueSql("''");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("''");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("' '");
