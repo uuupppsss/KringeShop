@@ -3,7 +3,9 @@
 
 @using KringeShopWebClient.Services;
 @using KringeShopLib.Model
+@using KringeShopWebClient.Extention
 
+@inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
 @inject ConnectionService connection;
 
@@ -38,6 +40,14 @@
 
     private async void SignInMethod()
     {
-        await connection.SignIn(username, pwd);
+        if (new[] {pwd, username}.All(s => !string.IsNullOrEmpty(s)))
+        {
+            await connection.SignIn(username, pwd);
+            if (connection.CurrentOperationResult.IsSuccess)
+                await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
+            else await jsruntime.ToastrError(connection.CurrentOperationResult.Message);
+        }
+        else await jsruntime.ToastrError("Заполните все поля");
+        
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KringeShopApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Orders
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<ActionResult<List<Order>>> GetOrders()
         {
@@ -31,6 +33,7 @@ namespace KringeShopApi.Controllers
             var result = orders.OrderByDescending(o => o.CreateDate);
             return Ok(result);
         }
+
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
@@ -49,6 +52,7 @@ namespace KringeShopApi.Controllers
 
         // PUT: api/Orders/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> PutOrder(int id, Order order)
         {
@@ -87,7 +91,7 @@ namespace KringeShopApi.Controllers
         //    foreach (var basketItem in basketItemsList)
         //    {
         //        Product product = await _context.Products.FirstOrDefaultAsync(p=>p.Id==basketItem.ProductId);
-               
+
         //    }
         //    _context.Orders.Add(order);
         //    await _context.SaveChangesAsync();
@@ -97,6 +101,7 @@ namespace KringeShopApi.Controllers
         //}
 
         // DELETE: api/Orders/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOrder(int id)
         {

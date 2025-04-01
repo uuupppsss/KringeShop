@@ -10,19 +10,18 @@ using System.Security.Claims;
 
 namespace KringeShopApi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly KrinageShopDbContext _context;
+
         public AuthController(KrinageShopDbContext context)
         {
             _context = context;
         }
 
-        // POST: api/Auth/SignUp
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost ("SignUp")]
+        [HttpPost]
         public async Task<ActionResult> SignUp(UserDTO sent_user)
         {
             User found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == sent_user.Username);
@@ -46,12 +45,12 @@ namespace KringeShopApi.Controllers
             else return BadRequest("Что-то пошло не так");
         }
 
-        // GET: api/Auth/SignIn/admin/admin
-        [HttpGet("SignIn/{username}/{password}")]
+        // GET: api/Auth/admin/admin
+        [HttpGet("{username}/{password}")]
         public async Task<ActionResult<ResponseTokenAndStuff>> SignIn(string username, string password)
         {
             var found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (found_user == null) return NotFound("Пользователь с тким именем не найден");
+            if (found_user == null) return Unauthorized("Пользователь с таким именем не найден");
             if (found_user.Password != password) return Unauthorized("Пароль не верный");
 
             var claims = new List<Claim>()

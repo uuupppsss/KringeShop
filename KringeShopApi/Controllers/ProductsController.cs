@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KringeShopApi.Controllers
 {
@@ -44,6 +45,7 @@ namespace KringeShopApi.Controllers
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> PutProduct(int id, Product product)
         {
@@ -76,6 +78,7 @@ namespace KringeShopApi.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult> PostProduct(Product product)
         {
@@ -87,6 +90,7 @@ namespace KringeShopApi.Controllers
         }
 
         // DELETE: api/Products/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {

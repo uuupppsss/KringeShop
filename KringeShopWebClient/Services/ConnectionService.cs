@@ -82,7 +82,7 @@ namespace KringeShopWebClient.Services
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString()
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
                     };
                 }
                 else CurrentOperationResult = new OperationResult()
@@ -107,13 +107,13 @@ namespace KringeShopWebClient.Services
             {
                 user.RoleId = 2;
                 string json = JsonSerializer.Serialize(user);
-                var responce = await client.PostAsync("Users", new StringContent(json, Encoding.UTF8, "application/json"));
+                var responce = await client.PostAsync("Auth", new StringContent(json, Encoding.UTF8, "application/json"));
                 if (!responce.IsSuccessStatusCode)
                 {
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString()
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
                     };
                 }
                 else
@@ -141,13 +141,13 @@ namespace KringeShopWebClient.Services
             ResponseTokenAndStuff serverResponce;
             try
             {
-                var responce = await client.GetAsync($"Users/SignIn/{username}/{password}");
+                var responce = await client.GetAsync($"Auth/{username}/{password}");
                 if (!responce.IsSuccessStatusCode)
                 {
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString()
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
                     };
                 }
                 else
