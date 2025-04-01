@@ -21,8 +21,6 @@ namespace KringeShopApi
     //    //{
     //    //    //заказ получен
     //    //}
-        
-
 
     //}
 }

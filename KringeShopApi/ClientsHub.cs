@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using KringeShopLib.Model;
 using KringeShopApi.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace KringeShopApi
 {

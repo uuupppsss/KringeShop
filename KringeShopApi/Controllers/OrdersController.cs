@@ -81,20 +81,20 @@ namespace KringeShopApi.Controllers
         // POST: api/Orders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> PostOrder(Order order, List<BasketItem> basketItemsList)
-        {
-            int fullcost = 0;
-            foreach (var basketItem in basketItemsList)
-            {
-                Product product = await _context.Products.FirstOrDefaultAsync(p=>p.Id==basketItem.ProductId);
+        //public async Task<ActionResult> PostOrder(Order order, List<BasketItem> basketItemsList)
+        //{
+        //    int fullcost = 0;
+        //    foreach (var basketItem in basketItemsList)
+        //    {
+        //        Product product = await _context.Products.FirstOrDefaultAsync(p=>p.Id==basketItem.ProductId);
                
-            }
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+        //    }
+        //    _context.Orders.Add(order);
+        //    await _context.SaveChangesAsync();
 
-            if(await _context.Orders.ContainsAsync(order)) return Ok();
-            else return BadRequest("Что-то пошло не так");    
-        }
+        //    if(await _context.Orders.ContainsAsync(order)) return Ok();
+        //    else return BadRequest("Что-то пошло не так");    
+        //}
 
         // DELETE: api/Orders/5
         [HttpDelete("{id}")]

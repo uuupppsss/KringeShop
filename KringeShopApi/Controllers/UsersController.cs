@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Cryptography.Xml;
+using System.Data;
 
 namespace KringeShopApi.Controllers
 {
@@ -76,13 +78,24 @@ namespace KringeShopApi.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult> SignUp(User user)
+        public async Task<ActionResult> SignUp(UserDTO sent_user)
         {
+            User user = new User()
+            {
+                Username = sent_user.Username,
+                Password = sent_user.Password,
+                Email = sent_user.Email,
+                ContactPhone = sent_user.ContactPhone,
+                RoleId = sent_user.RoleId,
+                Role= await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == sent_user.RoleId),
+                BasketItems = new List<BasketItem>(),
+                SavedProducts = new List<SavedProduct>(),
+                Orders = new List<Order>()
+            };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-           // await _hubContext.SignUserIn(user);
-
             if (await _context.Users.ContainsAsync(user)) return Ok();
+
             else return BadRequest("Что-то пошло не так");
         }
 

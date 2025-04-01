@@ -9,8 +9,6 @@
 @inject NavigationManager nav;
 @inject ConnectionService connection;
 
-<h3>Регистрация</h3>
-
 <div class="login-container">
     <h2>Регистрация</h2>
     <p>Почта</p>
@@ -53,7 +51,7 @@
         {
             if (pwd == repeat_pwd)
             {
-                await connection.SignUp(new User
+                await connection.SignUp(new UserDTO
                 {
                     Username=username,
                     Password=pwd,

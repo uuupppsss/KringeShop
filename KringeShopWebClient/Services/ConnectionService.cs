@@ -23,7 +23,7 @@ namespace KringeShopWebClient.Services
                .Build();
             client = new HttpClient()
             {
-                BaseAddress = new Uri("http://localhost:5216/api")
+                BaseAddress = new Uri("http://localhost:5216/api/")
             };
 
             this.userService = userService;
@@ -102,11 +102,11 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task SignUp(User user)
+        public async Task SignUp(UserDTO user)
         {
-            User current_user;
             try
             {
+                user.RoleId = 2;
                 string json = JsonSerializer.Serialize(user);
                 var responce = await client.PostAsync("Users", new StringContent(json, Encoding.UTF8, "application/json"));
                 if (!responce.IsSuccessStatusCode)
@@ -119,12 +119,10 @@ namespace KringeShopWebClient.Services
                 }
                 else
                 {
-                    current_user = await responce.Content.ReadFromJsonAsync<User>();
-                    userService.SetCurrentUser(current_user);
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = true,
-                        Message= $"Регистрация прошла успешно! Добро пожаловать,{current_user.Username}"
+                        Message= $"Регистрация прошла успешно! Выполните вход в систему"
                     };
                 }
 
