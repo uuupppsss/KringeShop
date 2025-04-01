@@ -158,7 +158,6 @@ namespace KringeShopWebClient.Services
                         Id=serverResponce.Id,
                         Username=username,
                         Password=password,
-                        Role=serverResponce.Role,
                         Email=serverResponce.Email,
                         ContactPhone=serverResponce.Phone
                     };
