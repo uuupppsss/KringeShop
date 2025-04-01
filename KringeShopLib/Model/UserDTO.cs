@@ -14,7 +14,9 @@ namespace KringeShopLib.Model
 
         public string Password { get; set; } = null!;
 
-        public int RoleId { get; set; }
+        public int RoleId { get; set; } = 0!;
+
+        public string Role { get; set; } = null!;
 
         public string Email { get; set; } = null!;
 

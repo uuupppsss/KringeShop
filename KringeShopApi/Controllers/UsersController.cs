@@ -75,39 +75,6 @@ namespace KringeShopApi.Controllers
             }
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult> SignUp(UserDTO sent_user)
-        {
-            User user = new User()
-            {
-                Username = sent_user.Username,
-                Password = sent_user.Password,
-                Email = sent_user.Email,
-                ContactPhone = sent_user.ContactPhone,
-                RoleId = sent_user.RoleId,
-                Role= await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == sent_user.RoleId),
-                BasketItems = new List<BasketItem>(),
-                SavedProducts = new List<SavedProduct>(),
-                Orders = new List<Order>()
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            if (await _context.Users.ContainsAsync(user)) return Ok();
-
-            else return BadRequest("Что-то пошло не так");
-        }
-
-        [HttpGet("SignIn/{username}/{password}")]
-        public async Task<ActionResult<User>> SignIn(string password, string username)
-        {
-            var found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (found_user == null) return NotFound("Пользователь с тким именем не найден");
-            if (found_user.Password != password) return BadRequest("Пароль не верный");
-            else return Ok(found_user);
-        }
-
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(int id)

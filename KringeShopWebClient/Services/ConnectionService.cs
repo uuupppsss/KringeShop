@@ -4,6 +4,8 @@ using System.Text;
 using System.Text.Json;
 using KringeShopWebClient.Model;
 using KringeShopWebClient.Extention;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace KringeShopWebClient.Services
 {
@@ -21,11 +23,8 @@ namespace KringeShopWebClient.Services
             connection = new HubConnectionBuilder()
                .WithUrl("http://localhost:5216/clientshub")
                .Build();
-            client = new HttpClient()
-            {
-                BaseAddress = new Uri("http://localhost:5216/api/")
-            };
 
+            client = Client.HttpClient;
             this.userService = userService;
             //this.notifyService = notifyService;
         }
@@ -139,7 +138,7 @@ namespace KringeShopWebClient.Services
 
         public async Task SignIn(string username, string password)
         {
-            User current_user;
+            ResponseTokenAndStuff serverResponce;
             try
             {
                 var responce = await client.GetAsync($"Users/SignIn/{username}/{password}");
@@ -153,12 +152,23 @@ namespace KringeShopWebClient.Services
                 }
                 else
                 {
-                    current_user = await responce.Content.ReadFromJsonAsync<User>();
-                    userService.SetCurrentUser(current_user);
+                    serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>();
+                    UserDTO authUser = new UserDTO()
+                    {
+                        Id=serverResponce.Id,
+                        Username=username,
+                        Password=password,
+                        Role=serverResponce.Role,
+                        Email=serverResponce.Email,
+                        ContactPhone=serverResponce.Phone
+                    };
+                    userService.SetCurrentUser(authUser);
+                    Client.SetToken(serverResponce.Token);
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = true,
-                        Message = $"Авторизация прошла успешно! Добро пожаловать,{current_user.Username}"
+                        Message = $"Авторизация прошла успешно! Токен - {serverResponce.Token}"
+                        //$"Авторизация прошла успешно! Добро пожаловать,{authUser.Username}"
                     };
                 }
             }
