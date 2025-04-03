@@ -1,8 +1,9 @@
 ﻿@page "/Account"
 @rendermode InteractiveServer
 
-@using KringeShopWebClient.Services;
+@using KringeShopWebClient.Services
 @using KringeShopLib.Model
+@using KringeShopWebClient.Components.Layout
 
 @inject NavigationManager nav;
 @inject UserService userservice;
@@ -22,10 +23,23 @@
 }
 else
 {
-    <div>
-        <p>@userservice.CurrentUser.Username</p>
-        <button>Изменить данные</button>
+    <div class="center-container">
+        <div class="auth-container">
+            <h5>Имя пользователя</h5>
+            <p>@userservice.CurrentUser.Username</p>
+            <h5>Электронная почта</h5>
+            <p>@userservice.CurrentUser.Email</p>
+            <h5>Контактный телефон</h5>
+            <p>@userservice.CurrentUser.ContactPhone</p>
+            <p></p>
+            <button style="margin-top:10px">Изменить данные</button>
+            <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
+            <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
+
+            <NoteTextLayout />
+        </div>
     </div>
+               
 }
 
 @code {
@@ -38,5 +52,21 @@ else
     private void SignUp()
     {
         nav.NavigateTo("SignUp");
+    }
+
+    private void SignOut()
+    {
+        userservice.ClearCurrentUser();
+        nav.NavigateTo("SignIn");
+    }
+
+    private void RemoveAccount()
+    {
+        
+    }
+
+    private void UpdateUser()
+    {
+        
     }
 }

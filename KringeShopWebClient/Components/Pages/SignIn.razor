@@ -44,7 +44,10 @@
         {
             await connection.SignIn(username, pwd);
             if (connection.CurrentOperationResult.IsSuccess)
-                await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
+            {
+                //await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
+                nav.NavigateTo("Account");
+            }    
             else await jsruntime.ToastrError(connection.CurrentOperationResult.Message);
         }
         else await jsruntime.ToastrError("Заполните все поля");

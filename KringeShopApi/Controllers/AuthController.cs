@@ -33,7 +33,7 @@ namespace KringeShopApi.Controllers
                 Email = sent_user.Email,
                 ContactPhone = sent_user.ContactPhone,
                 RoleId = sent_user.RoleId,
-                Role = await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == sent_user.RoleId),
+                Role = _context.UserRoles.FirstOrDefault(r => r.Id == sent_user.RoleId),
                 BasketItems = new List<BasketItem>(),
                 SavedProducts = new List<SavedProduct>(),
                 Orders = new List<Order>()
@@ -49,7 +49,7 @@ namespace KringeShopApi.Controllers
         [HttpGet("{username}/{password}")]
         public async Task<ActionResult<ResponseTokenAndStuff>> SignIn(string username, string password)
         {
-            var found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var found_user = await _context.Users.Include(u=>u.Role).FirstOrDefaultAsync(u => u.Username == username);
             if (found_user == null) return Unauthorized("Пользователь с таким именем не найден");
             if (found_user.Password != password) return Unauthorized("Пароль не верный");
 

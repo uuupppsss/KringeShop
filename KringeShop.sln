@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopApi", "KringeShop
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopLib", "KringeShopLib\KringeShopLib.csproj", "{33B3ACED-BB98-4710-BB39-27B6D839918A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KringeShopWebClient", "KringeShopWebClient\KringeShopWebClient.csproj", "{21447A34-A73F-4AB4-A02A-29C1AABA5764}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KringeShopWebClient", "KringeShopWebClient\KringeShopWebClient.csproj", "{21447A34-A73F-4AB4-A02A-29C1AABA5764}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

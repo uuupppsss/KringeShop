@@ -19,7 +19,7 @@
 
 <div>
     <div>
-        <button @onclick="TestToast">Нажми</button>
+        @* <button @onclick="TestToast">Нажми</button> *@
         <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
 
         <button @onclick="FilterProducts">
@@ -43,7 +43,9 @@
                 <p>Цена: @product.Price.ToString("C")</p>
                 @if (userservice.CurrentUser != null)
                 {
-                    <button @onclick="() => AddToBasket(product)">Добавить в корзину</button>
+                    <button @onclick="() => AddToBasket(product)">
+                        <i class="bi bi-basket"></i>
+                        </button>
                 }
             </div>
         }
