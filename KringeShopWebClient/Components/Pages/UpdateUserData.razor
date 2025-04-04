@@ -1,13 +1,43 @@
 ﻿@page "/UpdateUserData"
+@rendermode InteractiveServer
 
 @using KringeShopWebClient.Services
+@using KringeShopWebClient.Extention
+
+@inject UserService userService;
+@inject ConnectionService connectionService;
+@inject IJSRuntime jsruntime;
+
 
 <div class="center-container">
     <div class="auth-container">
-
+        <h5>Имя пользователя</h5>
+        <input type="text" @bind-value="username" />
+        <h5>Электронная почта</h5>
+        <input type="text" @bind-value="email"/>
+        <h5>Контактный телефон</h5>
+        <input type="text" @bind-value="phone"/>
+@*         <h5>Предыдущий пароль</h5>
+        <input type="password" @bind-value="oldPwd"/> *@
+        <h5>Новый пароль</h5>
+        <input type="password" @bind-value="newPwd"/>
+        <h5>Повторите пароль </h5>
+        <input type="password" @bind-value="repeatPwd"/>
+        <button @onclick="SaveData">Сохранить</button>
     </div>
 </div>
 
 @code {
+    private string username;
+    private string email;
+    private string phone;
+    private string oldPwd;
+    private string newPwd;
+    private string repeatPwd;
+
+    private void SaveData()
+    {
+        
+    }
 
 }

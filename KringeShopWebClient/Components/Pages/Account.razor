@@ -32,7 +32,7 @@ else
             <h5>Контактный телефон</h5>
             <p>@userservice.CurrentUser.ContactPhone</p>
             <p></p>
-            <button style="margin-top:10px">Изменить данные</button>
+            <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
             <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
             <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
 
@@ -62,11 +62,11 @@ else
 
     private void RemoveAccount()
     {
-        
+
     }
 
     private void UpdateUser()
     {
-        
+        nav.NavigateTo("UpdateUserData");
     }
 }

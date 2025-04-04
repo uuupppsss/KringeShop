@@ -51,13 +51,21 @@ namespace KringeShopApi.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutUser(int id, User user)
+        public async Task<ActionResult> PutUser(int id, UserDTO sent_user)
         {
-            if (id != user.Id)
+            if (id != sent_user.Id)
             {
                 return BadRequest();
             }
 
+            User user = new User()
+            {
+                Id=sent_user.Id,
+                Username=sent_user.Username,
+                Password=sent_user.Password,
+                Email=sent_user.Email,
+                ContactPhone=sent_user.ContactPhone
+            };
             _context.Entry(user).State = EntityState.Modified;
 
             try

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.Authorization;
+using System.Reflection.Metadata;
 
 namespace KringeShopApi.Controllers
 {
@@ -24,14 +25,53 @@ namespace KringeShopApi.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts()
+        public async Task<ActionResult<List<ProductDTO>>> GetProducts()
         {
-            return Ok(await _context.Products.ToListAsync());
+            List<ProductDTO> result = new List<ProductDTO>();
+            List<Product> products = new();
+           products = await _context.Products.ToListAsync();
+            foreach (var product in products)
+            {
+                result.Add(new ProductDTO()
+                {
+                    Id= product.Id,
+                    Name= product.Name,
+                    Description= product.Description,
+                    TypeId= product.TypeId,
+                    Price= product.Price,
+                    Count= product.Count,
+                    TimeBought= product.TimeBought
+                });
+            }
+            return Ok(result);
+        }
+
+        // GET: api/Products/Filter/filterword
+        [HttpGet("Filter/{filterword}")]
+        public async Task<ActionResult<List<ProductDTO>>> GetFilteredProducts(string filterword)
+        {
+            List<ProductDTO> result = new List<ProductDTO>();
+            List<Product> products = new();
+            products = await _context.Products.Where(p=>p.Name.Contains(filterword)||p.Description.Contains(filterword)).ToListAsync();
+            foreach (var product in products)
+            {
+                result.Add(new ProductDTO()
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    TypeId = product.TypeId,
+                    Price = product.Price,
+                    Count = product.Count,
+                    TimeBought = product.TimeBought
+                });
+            }
+            return Ok(result);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductDTO>> GetProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
 

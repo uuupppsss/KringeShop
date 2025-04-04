@@ -37,7 +37,7 @@ namespace KringeShopWebClient.Services
         //    await connection.InvokeAsync("ConnectClient", username);
         //}
 
-        public async Task<List<Product>> GetProductsList()
+        public async Task<List<ProductDTO>> GetProductsList()
         {
             try
             {
@@ -57,7 +57,7 @@ namespace KringeShopWebClient.Services
                     {
                         IsSuccess=true
                     };
-                    return await responce.Content.ReadFromJsonAsync<List<Product>>();
+                    return await responce.Content.ReadFromJsonAsync<List<ProductDTO>>();
                 }
             }
             catch (Exception ex)
@@ -65,18 +65,82 @@ namespace KringeShopWebClient.Services
                 CurrentOperationResult = new OperationResult()
                 {
                     IsSuccess = false,
-                    Message = "Ошибка: " + ex.ToString()
+                    Message = "Ошибка: " + ex.Message
                 };
                 return null;
             }
         }
 
-        public async Task CreateOrder(List<BasketItem> productsList)
+        public async Task<List<ProductDTO>> GetFilteredProductsList(string filterword)
         {
             try
             {
-                string json=JsonSerializer.Serialize(productsList);
-                var responce = await client.PostAsync("Orders", new StringContent(json, Encoding.UTF8, "application/json"));
+                var responce = await client.GetAsync($"Products/Filter/{filterword}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = false,
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString()
+                    };
+                    return null;
+                }
+                else
+                {
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = true
+                    };
+                    return await responce.Content.ReadFromJsonAsync<List<ProductDTO>>();
+                }
+            }
+            catch (Exception ex)
+            {
+                CurrentOperationResult = new OperationResult()
+                {
+                    IsSuccess = false,
+                    Message = "Ошибка: " + ex.Message
+                };
+                return null;
+            }
+        }
+
+        //public async Task CreateOrder(List<BasketItem> productsList)
+        //{
+        //    try
+        //    {
+        //        string json=JsonSerializer.Serialize(productsList);
+        //        var responce = await client.PostAsync("Orders", new StringContent(json, Encoding.UTF8, "application/json"));
+        //        if (!responce.IsSuccessStatusCode)
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+        //            };
+        //        }
+        //        else CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = true,
+        //            Message="Заказ успешно создан!"
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ошибка: " + ex.Message
+        //        };
+        //    }
+        //}
+
+        public async Task AddProductToBasket(BasketItemDTO basketItem)
+        {
+            try
+            {
+                string json = JsonSerializer.Serialize(basketItem);
+                var responce = await client.PostAsync("BasketItems", new StringContent(json, Encoding.UTF8, "application/json"));
                 if (!responce.IsSuccessStatusCode)
                 {
                     CurrentOperationResult = new OperationResult()
@@ -88,7 +152,7 @@ namespace KringeShopWebClient.Services
                 else CurrentOperationResult = new OperationResult()
                 {
                     IsSuccess = true,
-                    Message="Заказ успешно создан!"
+                    Message = "Товар добавлен в корзину"
                 };
             }
             catch (Exception ex)
@@ -96,7 +160,7 @@ namespace KringeShopWebClient.Services
                 CurrentOperationResult = new OperationResult()
                 {
                     IsSuccess = false,
-                    Message = "Ошибка: " + ex.ToString()
+                    Message = "Ошибка: " + ex.Message
                 };
             }
         }
@@ -131,7 +195,7 @@ namespace KringeShopWebClient.Services
                 CurrentOperationResult = new OperationResult()
                 {
                     IsSuccess = false,
-                    Message = "Ошибка: " + ex.ToString()
+                    Message = "Ошибка: " + ex.Message
                 };
             }
         }
@@ -176,9 +240,46 @@ namespace KringeShopWebClient.Services
                 CurrentOperationResult = new OperationResult()
                 {
                     IsSuccess = false,
-                    Message = "Ошибка: " + ex.ToString()
+                    Message = "Ошибка: " + ex.Message
                 };
             }
+        }
+
+        public async Task UpdateUser(UserDTO user)
+        {
+            try
+            {
+                user.Id = userService.CurrentUser.Id;
+                string json=JsonSerializer.Serialize(user);
+                var responce = await client.PutAsync($"Users/{user.Id}", new StringContent(json, Encoding.UTF8, "application/json"));
+                if (!responce.IsSuccessStatusCode)
+                {
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = false,
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+                    };
+                }
+                else
+                {
+                   
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = true,
+                        Message = $"Данные успешно изменены"
+                    };
+                    userService.SetCurrentUser(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                CurrentOperationResult = new OperationResult()
+                {
+                    IsSuccess = false,
+                    Message = "Ошибка: " + ex.Message
+                };
+            }
+
         }
     }
 }

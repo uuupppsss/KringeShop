@@ -22,6 +22,5 @@ namespace KringeShopLib.Model
 
         public int TimeBought { get; set; }
 
-        public virtual ProductType Type { get; set; } = null!;
     }
 }
