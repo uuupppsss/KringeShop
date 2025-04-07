@@ -5,6 +5,7 @@
 
 @inject UserService userservice;
 @inject NavigationManager nav;
+@inject ConnectionService connectionService;
 
 @using KringeShopLib.Model
 
@@ -29,15 +30,25 @@ else
             <h3></h3>
             <p>@basketItem.Count</p>
             <p>@basketItem.Cost</p>
-
-           
-
         </div>
     }
 }
 @code
 {
-    private List<BasketItemDTO> basketItems;
+    private List<BasketItemDTO> basketItems = new List<BasketItemDTO>();
+
+    protected override void OnInitialized()
+    {
+       GetBasketItems();
+    }
+
+    private async void GetBasketItems()
+    {
+        if(userservice.CurrentUser!=null)
+        {
+            basketItems = await connectionService.GetBasketItems(userservice.CurrentUser.Id);
+        }
+    }
 
     private void SignUp()
     {

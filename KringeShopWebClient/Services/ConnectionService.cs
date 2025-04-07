@@ -6,6 +6,7 @@ using KringeShopWebClient.Model;
 using KringeShopWebClient.Extention;
 using System.Net.Http.Headers;
 using System.Net.Http;
+using System.Net.WebSockets;
 
 namespace KringeShopWebClient.Services
 {
@@ -162,6 +163,41 @@ namespace KringeShopWebClient.Services
                     IsSuccess = false,
                     Message = "Ошибка: " + ex.Message
                 };
+            }
+        }
+
+        public async Task<List<BasketItemDTO>> GetBasketItems(int user_id)
+        {
+            try
+            {
+                var responce = await client.GetAsync($"BasketItems/GetUsersBasketItems/{user_id}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = false,
+                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+                    };
+                    return null;
+                }
+                else
+                {
+                    CurrentOperationResult = new OperationResult()
+                    {
+                        IsSuccess = true,
+                    };
+                    return await responce.Content.ReadFromJsonAsync<List<BasketItemDTO>>();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                CurrentOperationResult = new OperationResult()
+                {
+                    IsSuccess = false,
+                    Message = "Ошибка: " + ex.Message
+                };
+                return null;
             }
         }
 

@@ -21,11 +21,27 @@ namespace KringeShopApi.Controllers
             _context = context;
         }
 
-        // GET: api/BasketItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<BasketItem>>> GetBasketItems()
+        // GET: api/BasketItems/GetUsersBasketItems/1
+        [HttpGet("GetUsersBasketItems/{user_id}")]
+        public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(int user_id)
         {
-            return await _context.BasketItems.ToListAsync();
+            List<BasketItem> basketItems= await _context.BasketItems.Where(b=>b.UserId==user_id).ToListAsync();
+            List<BasketItemDTO> result = new();
+            if (basketItems.Count != 0)
+            {
+                foreach (var item in basketItems)
+                {
+                    result.Add(new BasketItemDTO()
+                    {
+                        Id = item.Id,
+                        UserId = user_id,
+                        ProductId = item.ProductId,
+                        Count = item.Count,
+                        Cost = item.Cost
+                    });
+                }
+            }
+            return Ok(result);
         }
 
         // GET: api/BasketItems/5

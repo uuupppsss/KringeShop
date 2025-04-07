@@ -64,7 +64,6 @@
 </div>
 
 @code {
-    private int count=1;
     private string filter = string.Empty;
     private List<ProductDTO> products = new List<ProductDTO>();
 
@@ -96,8 +95,8 @@
         {
             UserId=userservice.CurrentUser.Id,
             ProductId=product.Id,
-            Count=count,
-            Cost=product.Price*count
+            Count=1,
+            Cost=product.Price
         };
 
         await connectionService.AddProductToBasket(basketItem);
@@ -121,19 +120,4 @@
         }
     }
 
-    private void Plus(int productCount)
-    {
-        if(count<productCount)
-        {
-            count++;
-        }
-    }
-
-    private void Minus()
-    {
-        if(count>1)
-        {
-            count--;
-        }
-    }
 }

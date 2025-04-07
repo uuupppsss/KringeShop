@@ -4,11 +4,14 @@ namespace KringeShopWebClient.Services
 {
     public class UserService
     {
-        public UserDTO CurrentUser { get; private set; }
+        public delegate void UserHandler();
+        public event UserHandler? Notify;
+        public UserDTO? CurrentUser { get; private set; }
 
         public void SetCurrentUser(UserDTO user)
         {
             CurrentUser = user;
+            Notify?.Invoke();
         }
 
         public void ClearCurrentUser()
