@@ -1,5 +1,9 @@
+using KringeShopWebClient.Auth;
 using KringeShopWebClient.Components;
 using KringeShopWebClient.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
 
 namespace KringeShopWebClient
@@ -13,11 +17,21 @@ namespace KringeShopWebClient
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
-
-            builder.Services.AddSingleton<UserService>();
+            builder.Services.AddScoped<ProtectedSessionStorage>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddAuthenticationCore();
+            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            //    .AddCookie(options =>
+            //    {
+            //        options.Cookie.Name = "auth_token";
+            //        options.LoginPath = "/SignIn";
+            //        options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
+            //        options.AccessDeniedPath = "/SignIn";
+            //    });
+            //builder.Services.AddAuthorization();
+            builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddSingleton<ConnectionService>();
-            //builder.Services.AddSingleton<NotifyService>();
-            //builder.Services.AddBlazoredToast();
 
             var app = builder.Build();
 
@@ -33,6 +47,8 @@ namespace KringeShopWebClient
 
             app.UseStaticFiles();
             app.UseAntiforgery();
+            //app.UseAuthentication();
+            //app.UseAuthorization();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();

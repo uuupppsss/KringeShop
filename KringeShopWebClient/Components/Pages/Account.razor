@@ -6,41 +6,37 @@
 @using KringeShopWebClient.Components.Layout
 
 @inject NavigationManager nav;
-@inject UserService userservice;
 
 <h3>Личный кабинет</h3>
 
-@if (userservice.CurrentUser == null)
-{
-    <div class="center-container">
-        <div class="auth-container">
-            <button @onclick="SignIn">Войти</button>
-            <p>Ещё нет аккаунта?</p>
-            <button @onclick="SignUp">Зарегистрироваться</button>
+    <AuthorizeView>
+        <Authorized>
+        <div class="center-container">
+            <div class="auth-container">
+                <h5>Имя пользователя</h5>
+                <p></p>
+                <h5>Электронная почта</h5>
+                <p></p>
+                <h5>Контактный телефон</h5>
+                <p></p>
+                <p></p>
+                <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
+                <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
+                <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
+            </div>
         </div>
-    </div>
-
-}
-else
-{
-    <div class="center-container">
-        <div class="auth-container">
-            <h5>Имя пользователя</h5>
-            <p>@userservice.CurrentUser.Username</p>
-            <h5>Электронная почта</h5>
-            <p>@userservice.CurrentUser.Email</p>
-            <h5>Контактный телефон</h5>
-            <p>@userservice.CurrentUser.ContactPhone</p>
-            <p></p>
-            <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
-            <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
-            <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
-
-            <NoteTextLayout />
-        </div>
-    </div>
-               
-}
+        </Authorized>
+        <NotAuthorized>
+            <div class="center-container">
+                <div class="auth-container">
+                    <button @onclick="SignIn">Войти</button>
+                    <p>Ещё нет аккаунта?</p>
+                    <button @onclick="SignUp">Зарегистрироваться</button>
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+    
 
 @code {
 
@@ -56,8 +52,7 @@ else
 
     private void SignOut()
     {
-        userservice.ClearCurrentUser();
-        nav.NavigateTo("SignIn");
+        
     }
 
     private void RemoveAccount()

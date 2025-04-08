@@ -14,19 +14,17 @@ namespace KringeShopWebClient.Services
     {
         private readonly HubConnection connection;
         private readonly HttpClient client;
-        private readonly UserService userService;
         public OperationResult CurrentOperationResult {  get; private set; }
         //private readonly NotifyService notifyService;
 
 
-        public ConnectionService(UserService userService /*, NotifyService notifyService*/)
+        public ConnectionService()
         {
             connection = new HubConnectionBuilder()
                .WithUrl("http://localhost:5216/clientshub")
                .Build();
 
             client = Client.HttpClient;
-            this.userService = userService;
             //this.notifyService = notifyService;
         }
 
@@ -236,7 +234,7 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task SignIn(string username, string password)
+        public async Task<UserDTO> SignIn(string username, string password)
         {
             ResponseTokenAndStuff serverResponce;
             try
@@ -249,26 +247,27 @@ namespace KringeShopWebClient.Services
                         IsSuccess = false,
                         Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
                     };
+                    return null;
                 }
                 else
                 {
-                    serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>();
-                    UserDTO authUser = new UserDTO()
-                    {
-                        Id=serverResponce.Id,
-                        Username=username,
-                        Password=password,
-                        Email=serverResponce.Email,
-                        ContactPhone=serverResponce.Phone
-                    };
-                    userService.SetCurrentUser(authUser);
+                    serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>(); 
                     Client.SetToken(serverResponce.Token);
                     CurrentOperationResult = new OperationResult()
                     {
                         IsSuccess = true,
-                        Message = $"Авторизация прошла успешно! Токен - {serverResponce.Token}"
+                        //Message = $"Авторизация прошла успешно! Токен - {serverResponce.Token}"
                         //$"Авторизация прошла успешно! Добро пожаловать,{authUser.Username}"
                     };
+                    UserDTO authUser = new UserDTO()
+                    {
+                        Id = serverResponce.UserId,
+                        Username = username,
+                        Password = password,
+                        Email = serverResponce.Email,
+                        ContactPhone = serverResponce.Phone
+                    };
+                    return authUser;
                 }
             }
             catch (Exception ex)
@@ -278,44 +277,45 @@ namespace KringeShopWebClient.Services
                     IsSuccess = false,
                     Message = "Ошибка: " + ex.Message
                 };
+                return null;
             }
         }
 
-        public async Task UpdateUser(UserDTO user)
-        {
-            try
-            {
-                user.Id = userService.CurrentUser.Id;
-                string json=JsonSerializer.Serialize(user);
-                var responce = await client.PutAsync($"Users/{user.Id}", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
-                    };
-                }
-                else
-                {
+        //public async Task UpdateUser(UserDTO user)
+        //{
+        //    try
+        //    {
+        //        user.Id = userService.CurrentUser.Id;
+        //        string json=JsonSerializer.Serialize(user);
+        //        var responce = await client.PutAsync($"Users/{user.Id}", new StringContent(json, Encoding.UTF8, "application/json"));
+        //        if (!responce.IsSuccessStatusCode)
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+        //            };
+        //        }
+        //        else
+        //        {
                    
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = true,
-                        Message = $"Данные успешно изменены"
-                    };
-                    userService.SetCurrentUser(user);
-                }
-            }
-            catch (Exception ex)
-            {
-                CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = false,
-                    Message = "Ошибка: " + ex.Message
-                };
-            }
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = true,
+        //                Message = $"Данные успешно изменены"
+        //            };
+        //            userService.SetCurrentUser(user);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ошибка: " + ex.Message
+        //        };
+        //    }
 
-        }
+        //}
     }
 }

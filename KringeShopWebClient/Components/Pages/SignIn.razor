@@ -1,13 +1,17 @@
 ﻿@page "/SignIn"
 @rendermode InteractiveServer
 
-@using KringeShopWebClient.Services;
+@using KringeShopWebClient.Auth
+@using KringeShopWebClient.Model
+@using Microsoft.AspNetCore.Components.Authorization
+@using KringeShopWebClient.Services
 @using KringeShopLib.Model
 @using KringeShopWebClient.Extention
 
 @inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
-@inject ConnectionService connection;
+@inject AuthService authService;
+@inject AuthenticationStateProvider authStateProvider;
 
 <h3>Авторизация</h3>
 
@@ -33,6 +37,13 @@
     private string pwd;
     private string username;
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; } 
+    //var authState=await authenticationState; authState.User.Identity.Name <-- юз текущего пользователя
+
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
     private void SignUpMethod()
     {
         nav.NavigateTo("/SignUp");
@@ -40,17 +51,18 @@
 
     private async void SignInMethod()
     {
-        if (new[] {pwd, username}.All(s => !string.IsNullOrEmpty(s)))
+
+        ResponseTokenAndStuff response = await authService.SignIn(username, pwd);
+        if (response is null)
         {
-            await connection.SignIn(username, pwd);
-            if (connection.CurrentOperationResult.IsSuccess)
-            {
-                //await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
-                nav.NavigateTo("Account");
-            }    
-            else await jsruntime.ToastrError(connection.CurrentOperationResult.Message);
+            await jsruntime.ToastrError("Что то пошло не так");
+            return;
         }
-        else await jsruntime.ToastrError("Заполните все поля");
-        
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+        {
+            Username=response.Username,
+            Role=response.Role
+        });
     }
 }

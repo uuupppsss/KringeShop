@@ -3,36 +3,35 @@
 
 @using KringeShopWebClient.Services;
 
-@inject UserService userservice;
 @inject NavigationManager nav;
 @inject ConnectionService connectionService;
 
 @using KringeShopLib.Model
 
 <h3>Корзина товаров</h3>
-@if (userservice.CurrentUser == null)
-{
-    <div class="center-container">
-        <div class="auth-container">
-            <p>Для перехода в корзину товаров необходимо войти в учётную запись</p>
-            <button @onclick="SignIn">Войти</button>
-            <p>Ещё нет аккаунта?</p>
-            <button @onclick="SignUp">Зарегистрироваться</button>
-        </div>
-    </div>
-
-}
-else
-{
-    foreach(var basketItem in basketItems)
-    {
-        <div style="display:flex; margin:5px" >
+<AuthorizeView>
+    <Authorized>
+        @foreach(var basketItem in basketItems)
+        {
+        <div style="display:flex; margin:5px">
             <h3></h3>
             <p>@basketItem.Count</p>
             <p>@basketItem.Cost</p>
         </div>
-    }
-}
+        }
+    </Authorized>
+
+    <NotAuthorized>
+        <div class="center-container">
+            <div class="auth-container">
+                <p>Для перехода в корзину товаров необходимо войти в учётную запись</p>
+                <button @onclick="SignIn">Войти</button>
+                <p>Ещё нет аккаунта?</p>
+                <button @onclick="SignUp">Зарегистрироваться</button>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 @code
 {
     private List<BasketItemDTO> basketItems = new List<BasketItemDTO>();
@@ -44,10 +43,10 @@ else
 
     private async void GetBasketItems()
     {
-        if(userservice.CurrentUser!=null)
-        {
-            basketItems = await connectionService.GetBasketItems(userservice.CurrentUser.Id);
-        }
+        // if(userservice.CurrentUser!=null)
+        // {
+        //     basketItems = await connectionService.GetBasketItems(userservice.CurrentUser.Id);
+        // }
     }
 
     private void SignUp()
