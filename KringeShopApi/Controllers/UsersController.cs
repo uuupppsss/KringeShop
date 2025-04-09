@@ -33,19 +33,27 @@ namespace KringeShopApi.Controllers
             return Ok(await _context.Users.ToListAsync());
         }
 
-        // GET: api/Users/5
-        [Authorize(Roles = "admin")]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        // GET: api/Users/username
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserDTO>> GetUser(string username)
         {
-            var user = await _context.Users.FindAsync(id);
-
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             if (user == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            UserDTO result = new UserDTO()
+            {
+                Id= user.Id,
+                Username = user.Username,
+                Password = user.Password,
+                ContactPhone = user.ContactPhone,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                //Role=user.Role.Title
+            };
+            return Ok(result);
         }
 
         // PUT: api/Users/5
@@ -108,28 +116,5 @@ namespace KringeShopApi.Controllers
             return _context.Users.Any(e => e.Id == id);
         }
 
-        //[HttpPost("SignUp")]
-        //public async Task<ActionResult> SignUp(UserDTO sent_user)
-        //{
-        //    User found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == sent_user.Username);
-        //    if (found_user != null) return BadRequest("Такой логин уже существует");
-        //    User user = new User()
-        //    {
-        //        Username = sent_user.Username,
-        //        Password = sent_user.Password,
-        //        Email = sent_user.Email,
-        //        ContactPhone = sent_user.ContactPhone,
-        //        RoleId = sent_user.RoleId,
-        //        Role = await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == sent_user.RoleId),
-        //        BasketItems = new List<BasketItem>(),
-        //        SavedProducts = new List<SavedProduct>(),
-        //        Orders = new List<Order>()
-        //    };
-        //    _context.Users.Add(user);
-        //    await _context.SaveChangesAsync();
-        //    if (await _context.Users.ContainsAsync(user)) return Ok();
-
-        //    else return BadRequest("Что-то пошло не так");
-        //}
     }
 }

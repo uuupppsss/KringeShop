@@ -26,6 +26,7 @@ namespace KringeShopApi.Controllers
         {
             User found_user = await _context.Users.FirstOrDefaultAsync(u => u.Username == sent_user.Username);
             if (found_user != null) return BadRequest("Такой логин уже существует");
+
             User user = new User()
             {
                 Username = sent_user.Username,
@@ -57,8 +58,6 @@ namespace KringeShopApi.Controllers
             {
                 new Claim(ClaimValueTypes.Integer32, found_user.Id.ToString()),
                 new Claim (ClaimTypes.Role, found_user.Role.Title),
-                //new Claim(ClaimTypes.Email, found_user.Email),
-                //new Claim(ClaimTypes.MobilePhone, found_user.ContactPhone)
             };
 
             var jwt = new JwtSecurityToken(
@@ -67,7 +66,7 @@ namespace KringeShopApi.Controllers
         //кладём полезную нагрузку
         claims: claims,
         //устанавливаем время жизни токена 2 минуты
-        expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+        expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
         signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
             string token = new JwtSecurityTokenHandler().WriteToken(jwt);
@@ -78,7 +77,8 @@ namespace KringeShopApi.Controllers
                 UserId= found_user.Id,
                 Role = found_user.Role.Title,
                 Email=found_user.Email,
-                Phone=found_user.ContactPhone
+                Phone=found_user.ContactPhone,
+                Username=found_user.Username
             });
         }
     }

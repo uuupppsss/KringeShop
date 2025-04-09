@@ -37,12 +37,8 @@
     private string pwd;
     private string username;
 
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; } 
-    //var authState=await authenticationState; authState.User.Identity.Name <-- юз текущего пользователя
-
-    [CascadingParameter]
-    public HttpContext? httpContext { get; set; }
+    // [CascadingParameter]
+    // public HttpContext? httpContext { get; set; }
 
     private void SignUpMethod()
     {
@@ -64,5 +60,6 @@
             Username=response.Username,
             Role=response.Role
         });
+        nav.NavigateTo("/");
     }
 }

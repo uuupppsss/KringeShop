@@ -234,52 +234,52 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task<UserDTO> SignIn(string username, string password)
-        {
-            ResponseTokenAndStuff serverResponce;
-            try
-            {
-                var responce = await client.GetAsync($"Auth/{username}/{password}");
-                if (!responce.IsSuccessStatusCode)
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
-                    };
-                    return null;
-                }
-                else
-                {
-                    serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>(); 
-                    Client.SetToken(serverResponce.Token);
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = true,
-                        //Message = $"Авторизация прошла успешно! Токен - {serverResponce.Token}"
-                        //$"Авторизация прошла успешно! Добро пожаловать,{authUser.Username}"
-                    };
-                    UserDTO authUser = new UserDTO()
-                    {
-                        Id = serverResponce.UserId,
-                        Username = username,
-                        Password = password,
-                        Email = serverResponce.Email,
-                        ContactPhone = serverResponce.Phone
-                    };
-                    return authUser;
-                }
-            }
-            catch (Exception ex)
-            {
-                CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = false,
-                    Message = "Ошибка: " + ex.Message
-                };
-                return null;
-            }
-        }
+        //public async Task<UserDTO> SignIn(string username, string password)
+        //{
+        //    ResponseTokenAndStuff serverResponce;
+        //    try
+        //    {
+        //        var responce = await client.GetAsync($"Auth/{username}/{password}");
+        //        if (!responce.IsSuccessStatusCode)
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+        //            };
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>(); 
+        //            Client.SetToken(serverResponce.Token);
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = true,
+        //                //Message = $"Авторизация прошла успешно! Токен - {serverResponce.Token}"
+        //                //$"Авторизация прошла успешно! Добро пожаловать,{authUser.Username}"
+        //            };
+        //            UserDTO authUser = new UserDTO()
+        //            {
+        //                Id = serverResponce.UserId,
+        //                Username = username,
+        //                Password = password,
+        //                Email = serverResponce.Email,
+        //                ContactPhone = serverResponce.Phone
+        //            };
+        //            return authUser;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ошибка: " + ex.Message
+        //        };
+        //        return null;
+        //    }
+        //}
 
         //public async Task UpdateUser(UserDTO user)
         //{

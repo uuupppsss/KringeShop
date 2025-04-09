@@ -14,7 +14,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<AuthorizeView>
+<AuthorizeView Roles="user,admin">
     <Authorized>
         <h3>Hello @context.User.Identity.Name</h3>
     </Authorized>
@@ -70,10 +70,14 @@
 @code {
     private string filter = string.Empty;
     private List<ProductDTO> products = new List<ProductDTO>();
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
 
     private async void TestToast()
     {
-        await jsruntime.InvokeVoidAsync("alert","ААААААААААААААААААААААА");
+        var authState=await authenticationState; 
+        await jsruntime.InvokeVoidAsync("alert", $"Hello, {authState.User.Identity.Name}");
     }
 
     private async void ShowSuccessMessage(string message)

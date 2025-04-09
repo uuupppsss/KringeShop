@@ -17,9 +17,6 @@ namespace KringeShopWebClient
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
-            builder.Services.AddScoped<ProtectedSessionStorage>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            builder.Services.AddSingleton<AuthService>();
             builder.Services.AddAuthenticationCore();
             //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             //    .AddCookie(options =>
@@ -31,7 +28,13 @@ namespace KringeShopWebClient
             //    });
             //builder.Services.AddAuthorization();
             builder.Services.AddCascadingAuthenticationState();
+            //зависимости
+            builder.Services.AddScoped<ProtectedSessionStorage>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            //синглтоны
             builder.Services.AddSingleton<ConnectionService>();
+            builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<UserService>();
 
             var app = builder.Build();
 

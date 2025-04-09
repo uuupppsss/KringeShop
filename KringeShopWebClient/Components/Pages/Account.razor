@@ -6,19 +6,23 @@
 @using KringeShopWebClient.Components.Layout
 
 @inject NavigationManager nav;
+@inject UserService userSerice;
 
 <h3>Личный кабинет</h3>
 
-    <AuthorizeView>
+    <AuthorizeView Roles="user,admin">
         <Authorized>
         <div class="center-container">
             <div class="auth-container">
-                <h5>Имя пользователя</h5>
-                <p></p>
-                <h5>Электронная почта</h5>
-                <p></p>
-                <h5>Контактный телефон</h5>
-                <p></p>
+                @if(CurrentUser!=null)
+                {
+                    <h5>Имя пользователя</h5>
+                    <p>@CurrentUser.Username</p>
+                    <h5>Электронная почта</h5>
+                    <p>@CurrentUser.Email</p>
+                    <h5>Контактный телефон</h5>
+                    <p>@CurrentUser.ContactPhone</p>
+                }
                 <p></p>
                 <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
                 <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
@@ -39,6 +43,21 @@
     
 
 @code {
+    private UserDTO CurrentUser;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    private async void LoadData()
+    {
+        var authState = await authenticationState;
+        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
+            CurrentUser = await userSerice.GetUserData(authState.User.Identity.Name);
+    }
 
     private void SignIn()
     {
