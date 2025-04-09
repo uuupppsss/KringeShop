@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
+using KringeShopApi.HomeModel;
 
 namespace KringeShopApi.Controllers
 {

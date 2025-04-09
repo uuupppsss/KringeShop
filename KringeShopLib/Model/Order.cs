@@ -7,8 +7,6 @@ public partial class Order
 {
     public int Id { get; set; }
 
-    public int UserId { get; set; }
-
     public string? Adress { get; set; }
 
     public decimal FullCost { get; set; }
@@ -22,6 +20,10 @@ public partial class Order
     public bool IsCmpleted { get; set; }
 
     public bool IsSelfPickUp { get; set; }
+
+    public int UserId { get; set; }
+
+    public virtual ICollection<OrderItem> Orderitems { get; set; } = new List<OrderItem>();
 
     public virtual OrderStatus Status { get; set; } = null!;
 

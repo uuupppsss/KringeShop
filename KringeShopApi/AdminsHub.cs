@@ -1,4 +1,5 @@
-﻿using KringeShopApi.Model;
+﻿using KringeShopApi.HomeModel;
+using KringeShopApi.Model;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 

@@ -16,17 +16,45 @@
             <div class="auth-container">
                 @if(CurrentUser!=null)
                 {
-                    <h5>Имя пользователя</h5>
-                    <p>@CurrentUser.Username</p>
-                    <h5>Электронная почта</h5>
-                    <p>@CurrentUser.Email</p>
-                    <h5>Контактный телефон</h5>
-                    <p>@CurrentUser.ContactPhone</p>
+                    if(!userDataChange)
+                    {
+                        <h5>Имя пользователя</h5>
+                        <p>@CurrentUser.Username</p>
+                        <h5>Электронная почта</h5>
+                        <p>@CurrentUser.Email</p>
+                        <h5>Контактный телефон</h5>
+                        <p>@CurrentUser.ContactPhone</p>
+                        <p></p>
+                        <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
+                        <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
+                        <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
+                        <button style="margin-top:10px" @onclick="UpdatePassword">Изменить пароль</button>
+                    }
+                    else 
+                    {
+
+                            <h5>Имя пользователя</h5>
+                            <input type="text" @bind-value="@CurrentUser.Username" />
+                            <h5>Электронная почта</h5>
+                            <input type="text" @bind-value="@CurrentUser.Email" />
+                            <h5>Контактный телефон</h5>
+                            <input type="text" @bind-value="@CurrentUser.ContactPhone" />
+                            <button style="margin-top:10px" @onclick="SaveUserData">Сохранить</button>
+
+                        
+                    }
+                    if (passwordChange)
+                    {
+                        <h5>Старый пароль</h5>
+                        <input type="password" @bind-value="@oldPwd" />
+                        <h5>Новый пароль</h5>
+                        <input type="password" @bind-value="@newPwd" />
+                        <h5>Повторите пароль</h5>
+                        <input type="password" @bind-value="@repeatPwd" />
+                        <button style="margin-top:10px" @onclick="SavePassword"> Сохранить</button>
+                    }
                 }
-                <p></p>
-                <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
-                <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
-                <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
+
             </div>
         </div>
         </Authorized>
@@ -43,16 +71,20 @@
     
 
 @code {
+    private bool passwordChange=false;
+    private bool userDataChange=false;
+
+    private string oldPwd;
+    private string newPwd;
+    private string repeatPwd;
+
     private UserDTO CurrentUser;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    protected override void OnInitialized()
-    {
-        LoadData();
-    }
+    protected override Task OnInitializedAsync() => LoadData();
 
-    private async void LoadData()
+    private async Task LoadData()
     {
         var authState = await authenticationState;
         if (!string.IsNullOrEmpty(authState.User.Identity.Name))
@@ -71,7 +103,7 @@
 
     private void SignOut()
     {
-        
+
     }
 
     private void RemoveAccount()
@@ -81,6 +113,24 @@
 
     private void UpdateUser()
     {
-        nav.NavigateTo("UpdateUserData");
+        userDataChange = true;
+        StateHasChanged();
+    }
+    private void UpdatePassword()
+    {
+        passwordChange=true;
+        StateHasChanged();
+    }
+
+
+    private void SavePassword()
+    {
+        passwordChange = false;
+        StateHasChanged();
+    }
+    private void SaveUserData()
+    {
+        userDataChange = false;
+        StateHasChanged();
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography.Xml;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using KringeShopApi.HomeModel;
 
 namespace KringeShopApi.Controllers
 {
@@ -26,11 +27,25 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Users
-        [Authorize(Roles = "admin")]
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        public async Task<ActionResult<List<UserDTO>>> GetUsers()
         {
-            return Ok(await _context.Users.ToListAsync());
+            List<User> users = await _context.Users.ToListAsync();
+            if(users is null||users.Count==0) return NotFound();
+            List<UserDTO> result = new List<UserDTO>();
+            foreach(var user in users)
+            {
+                result.Add(new UserDTO()
+                {
+                    Id=user.Id,
+                    Username=user.Username,
+                    Password=user.Password,
+                    Email=user.Email,
+                    ContactPhone=user.ContactPhone,
+                    RoleId=user.RoleId,
+                });
+            }
+            return Ok(result);
         }
 
         // GET: api/Users/username

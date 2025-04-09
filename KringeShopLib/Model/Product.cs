@@ -19,9 +19,11 @@ public partial class Product
 
     public int TimeBought { get; set; }
 
-    public virtual ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+    public virtual ICollection<BasketItem> Basketitems { get; set; } = new List<BasketItem>();
 
-    public virtual ICollection<SavedProduct> SavedProducts { get; set; } = new List<SavedProduct>();
+    public virtual ICollection<OrderItem> Orderitems { get; set; } = new List<OrderItem>();
+
+    public virtual ICollection<SavedProduct> Savedproducts { get; set; } = new List<SavedProduct>();
 
     public virtual ProductType Type { get; set; } = null!;
 }

@@ -2,6 +2,7 @@
 using KringeShopLib.Model;
 using KringeShopApi.Model;
 using Microsoft.AspNetCore.Mvc;
+using KringeShopApi.HomeModel;
 
 namespace KringeShopApi
 {

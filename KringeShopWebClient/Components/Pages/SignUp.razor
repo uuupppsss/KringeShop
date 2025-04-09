@@ -2,68 +2,63 @@
 @rendermode InteractiveServer
 
 @using KringeShopWebClient.Services;
-@using KringeShopLib.Model
-@using KringeShopWebClient.Extention
+@using KringeShopLib.Model;
+@using KringeShopWebClient.Extention;
+@using KringeShopWebClient.Model;
+
 
 @inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
-@inject ConnectionService connection;
+@inject AuthService connection;
 
 <div class="login-container">
-    <h2>Регистрация</h2>
-    <p>Почта</p>
-    <input type="text" class="input-field" @bind-value="email"/>
-    <p>Контактный телефон</p>
-    <input type="text" class="input-field" @bind-value="phone"/>
-    <p>Логин</p>
-    <input type="text" class="input-field" @bind-value="username"/>
 
-    <p>Пароль</p>
-    <input type="password" class="input-field" @bind-value="pwd"/>
+   <EditForm Model="@model" OnValidSubmit="SignUpMethod">
+       <DataAnnotationsValidator/>
+       <ValidationSummary/>
+        <p>Логин</p>
+        <InputText class="form-control" @bind-Value="@model.UserName" style="input-field"></InputText>
 
-    <p>Повторите пароль</p>
-    <input type="password" class="input-field" @bind-value="repeat_pwd"/>
-    <button @onclick="SignUpMethod" class="btn">Зарегистрироваться</button>
-    <p>Уже есть аккаунт?</p>
-    <button @onclick="SignInMethod" class="btn">Войти</button>
+        <p >Почта</p>
+        <InputText class="form-control" @bind-Value="@model.Email" style="input-field"></InputText>
 
+        <p >Контактный телефон</p>
+        <InputText class="form-control" @bind-Value="@model.PhoneNumber" style="input-field"></InputText>
+
+        <p>Пароль</p>
+        <InputText type="password" class="form-control" @bind-Value="@model.Password" style="input-field"></InputText>
+
+        <p>Повторите пароль</p>
+        <InputText p type="password" class="form-control" @bind-Value="@model.RepeatPassword" style="input-field"></InputText>
+
+        <button type="submit" class="btn">Зарегистрироваться</button>
+        <p>Уже есть аккаунт?</p>
+        <button @onclick="SignInMethod" class="btn">Войти</button>
+    </EditForm>
 
 </div>
 
 
 
 @code {
-    private string pwd;
-    private string repeat_pwd;
-    private string username;
-    private string email;
-    private string phone;
+
+
+    private SignUpForm model;
+
+    protected override void OnInitialized()
+    {
+        model = new SignUpForm(connection);
+        base.OnInitialized();
+    }
 
     private void SignInMethod()
     {
         nav.NavigateTo("/SignIn");
     }
 
-    private async void SignUpMethod()
+    private void SignUpMethod()
     {
-        if (new[] { repeat_pwd, pwd, username, email, phone }
-            .All(s => !string.IsNullOrEmpty(s)))
-        {
-            if (pwd == repeat_pwd)
-            {
-                await connection.SignUp(new UserDTO
-                {
-                    Username=username,
-                    Password=pwd,
-                    Email=email,
-                    ContactPhone=phone
-                });
-                if(connection.CurrentOperationResult.IsSuccess) 
-                    await jsruntime.ToastrSuccess(connection.CurrentOperationResult.Message);
-                else await jsruntime.ToastrError(connection.CurrentOperationResult.Message);
-            }
-            else await jsruntime.ToastrError("Пароли не совпадают");
-        }
-        else await jsruntime.ToastrError("Заполните все поля");
+        model.SignUp();
+        nav.NavigateTo("SignIn", true);
     }
 }

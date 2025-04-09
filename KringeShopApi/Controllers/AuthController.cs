@@ -1,9 +1,11 @@
-﻿using KringeShopApi.Model;
+﻿using KringeShopApi.HomeModel;
+using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -80,6 +82,31 @@ namespace KringeShopApi.Controllers
                 Phone=found_user.ContactPhone,
                 Username=found_user.Username
             });
+        }
+
+        [HttpGet("IfUniqueEmail/{email}")]
+        public async Task<ActionResult> IfUniqueEmail(string email)
+        {
+            var result = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (result == null) return Ok();
+            else return BadRequest();
+
+        }
+
+        [HttpGet("IfUniqueUsername/{username}")]
+        public async Task<ActionResult> IfUniqueUsername(string username)
+        {
+            var result = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (result == null) return Ok();
+            else return BadRequest();
+        }
+
+        [HttpGet("IfUniquePhone/{phone}")]
+        public async Task<ActionResult> IfUniquePhone(string phone)
+        {
+            var result = await _context.Users.FirstOrDefaultAsync(u => u.ContactPhone == phone);
+            if (result == null) return Ok();
+            else return BadRequest();
         }
     }
 }

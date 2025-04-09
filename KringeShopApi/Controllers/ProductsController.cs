@@ -9,6 +9,7 @@ using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.Authorization;
 using System.Reflection.Metadata;
+using KringeShopApi.HomeModel;
 
 namespace KringeShopApi.Controllers
 {
