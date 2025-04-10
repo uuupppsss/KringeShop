@@ -31,18 +31,18 @@ namespace KringeShopApi.Controllers
         public async Task<ActionResult<List<UserDTO>>> GetUsers()
         {
             List<User> users = await _context.Users.ToListAsync();
-            if(users is null||users.Count==0) return NotFound();
+            if (users is null || users.Count == 0) return NotFound();
             List<UserDTO> result = new List<UserDTO>();
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 result.Add(new UserDTO()
                 {
-                    Id=user.Id,
-                    Username=user.Username,
-                    Password=user.Password,
-                    Email=user.Email,
-                    ContactPhone=user.ContactPhone,
-                    RoleId=user.RoleId,
+                    Id = user.Id,
+                    Username = user.Username,
+                    Password = user.Password,
+                    Email = user.Email,
+                    ContactPhone = user.ContactPhone,
+                    RoleId = user.RoleId,
                 });
             }
             return Ok(result);
@@ -60,7 +60,7 @@ namespace KringeShopApi.Controllers
 
             UserDTO result = new UserDTO()
             {
-                Id= user.Id,
+                Id = user.Id,
                 Username = user.Username,
                 Password = user.Password,
                 ContactPhone = user.ContactPhone,
@@ -73,24 +73,14 @@ namespace KringeShopApi.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<ActionResult> PutUser(int id, UserDTO sent_user)
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(UserDTO sent_user)
         {
-            if (id != sent_user.Id)
-            {
-                return BadRequest();
-            }
-
-            User user = new User()
-            {
-                Id=sent_user.Id,
-                Username=sent_user.Username,
-                Password=sent_user.Password,
-                Email=sent_user.Email,
-                ContactPhone=sent_user.ContactPhone
-            };
-            _context.Entry(user).State = EntityState.Modified;
-
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == sent_user.Id);
+            if (user is null) return NotFound();
+            user.Email = sent_user.Email;
+            user.ContactPhone = sent_user.ContactPhone;
+            user.Username = sent_user.Username;
             try
             {
                 await _context.SaveChangesAsync();
@@ -98,14 +88,24 @@ namespace KringeShopApi.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    return BadRequest(ex.Message);
-                }
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdatePassword/{user_id}")]
+        public async Task<ActionResult> UpdateUserPassword(string new_password, int user_id)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == user_id);
+            if (user is null) return NotFound();
+            user.Password = new_password;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 

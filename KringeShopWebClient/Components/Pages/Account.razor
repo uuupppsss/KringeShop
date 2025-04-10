@@ -4,9 +4,11 @@
 @using KringeShopWebClient.Services
 @using KringeShopLib.Model
 @using KringeShopWebClient.Components.Layout
+@using KringeShopWebClient.Extention
 
 @inject NavigationManager nav;
 @inject UserService userSerice;
+@inject IJSRuntime js;
 
 <h3>Личный кабинет</h3>
 
@@ -128,9 +130,15 @@
         passwordChange = false;
         StateHasChanged();
     }
-    private void SaveUserData()
+    private async void SaveUserData()
     {
-        userDataChange = false;
-        StateHasChanged();
+        bool result = await userSerice.UpdateUser(CurrentUser);
+        if (result)
+        {
+            await LoadData();
+            userDataChange = false;
+            StateHasChanged();
+        }
+        else await js.ToastrError("Ошибка сохранения данных");
     }
 }

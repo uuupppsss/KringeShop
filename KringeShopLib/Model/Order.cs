@@ -23,7 +23,7 @@ public partial class Order
 
     public int UserId { get; set; }
 
-    public virtual ICollection<OrderItem> Orderitems { get; set; } = new List<OrderItem>();
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual OrderStatus Status { get; set; } = null!;
 

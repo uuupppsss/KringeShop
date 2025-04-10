@@ -1,4 +1,6 @@
 ﻿using KringeShopLib.Model;
+using System.Text;
+using System.Text.Json;
 
 namespace KringeShopWebClient.Services
 {
@@ -27,6 +29,30 @@ namespace KringeShopWebClient.Services
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        public async Task<bool> UpdateUser(UserDTO user)
+        {
+            try
+            {
+                string json=JsonSerializer.Serialize(user);
+                var responce = await client.PutAsync("Users", new StringContent(json, Encoding.UTF8, "application/json"));
+                if (!responce.IsSuccessStatusCode)
+                {
+                    //server error
+                    return false;
+                }
+                else
+                {
+                    //success
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                //error
+                return false;
             }
         }
     }
