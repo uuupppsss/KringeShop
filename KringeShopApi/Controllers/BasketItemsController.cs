@@ -23,9 +23,12 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/BasketItems/GetUsersBasketItems/1
-        [HttpGet("GetUsersBasketItems/{user_id}")]
-        public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(int user_id)
+        [HttpGet("GetUsersBasketItems/{username}")]
+        public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(string username)
         {
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user is null) return NotFound();
+            int user_id = user.Id;
             List<BasketItem> basketItems= await _context.BasketItems.Where(b=>b.UserId==user_id).ToListAsync();
             List<BasketItemDTO> result = new();
             if (basketItems.Count != 0)
@@ -91,22 +94,22 @@ namespace KringeShopApi.Controllers
 
         // POST: api/BasketItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult> PostBasketItem(BasketItemDTO sent_basketItem)
+        [HttpPost("{username}")]
+        public async Task<ActionResult> PostBasketItem(string username, BasketItemDTO sent_basketItem)
         {
             if (sent_basketItem == null) return BadRequest(); 
             Product product= await _context.Products.FirstOrDefaultAsync(p=>p.Id== sent_basketItem.ProductId);
             if (product == null) return NotFound();
-            User user= await _context.Users.FirstOrDefaultAsync(u=>u.Id==sent_basketItem.UserId);
+            User user= await _context.Users.FirstOrDefaultAsync(u=>u.Username==username);
             if (user == null) return NotFound();
             BasketItem basketItem = new BasketItem()
             {
-                UserId = sent_basketItem.UserId,
+                UserId = user.Id,
                 ProductId = sent_basketItem.ProductId,
                 Cost = sent_basketItem.Cost,
                 Count = sent_basketItem.Count,
-                Product=product,
-                User=user
+                Product = product,
+                User = user
             };
             _context.BasketItems.Add(basketItem);
             await _context.SaveChangesAsync();

@@ -4,20 +4,31 @@
 @using KringeShopWebClient.Services;
 
 @inject NavigationManager nav;
-@inject ConnectionService connectionService;
+@inject CustomerService customerService;
 
 @using KringeShopLib.Model
 
 <h3>Корзина товаров</h3>
-<AuthorizeView>
+<AuthorizeView Roles="user">
     <Authorized>
-        @foreach(var basketItem in basketItems)
+        @if(basketItems!=null)
         {
-        <div style="display:flex; margin:5px">
-            <h3></h3>
-            <p>@basketItem.Count</p>
-            <p>@basketItem.Cost</p>
-        </div>
+            if(basketItems.Count!=null)
+            {
+                    @foreach (var basketItem in basketItems)
+                    {
+                    <div style="display:flex; margin:5px">
+                        <p>@basketItem.Count</p>
+                        <p>шт.</p>
+                        <p>@basketItem.Cost</p>
+                        <p>рублей</p>
+                    </div>
+                    }
+            }
+            else
+            {
+                <p>Корзина пуста</p>
+            }
         }
     </Authorized>
 
@@ -34,19 +45,18 @@
 </AuthorizeView>
 @code
 {
-    private List<BasketItemDTO> basketItems = new List<BasketItemDTO>();
+    private List<BasketItemDTO> basketItems;
 
-    protected override void OnInitialized()
-    {
-       GetBasketItems();
-    }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
-    private async void GetBasketItems()
+    protected override Task OnInitializedAsync() => LoadData();
+
+    private async Task LoadData()
     {
-        // if(userservice.CurrentUser!=null)
-        // {
-        //     basketItems = await connectionService.GetBasketItems(userservice.CurrentUser.Id);
-        // }
+        var authState = await authenticationState;
+        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
+            basketItems=await customerService.GetUserBasket(authState.User.Identity.Name);
     }
 
     private void SignUp()

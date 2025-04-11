@@ -9,8 +9,9 @@
 
 @inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
-@inject ConnectionService connectionService;
+@inject CustomerService customerService;
 @inject AuthService authService;
+@inject ConnectionService connectionService;
 
 <PageTitle>Home</PageTitle>
 
@@ -104,10 +105,16 @@
 
     private async void AddToBasket(ProductDTO product)
     {
-       
+        var authState = await authenticationState;
+        int count = 1;
+        BasketItemDTO basketitem = new BasketItemDTO()
+        {
+            ProductId=product.Id,
+            Count=count,
+            Cost=product.Price*count
+        };
 
-       
-
+        await customerService.AddProductToBasket(authState.User.Identity.Name, basketitem);
     }
 
     private async void GetProducts()

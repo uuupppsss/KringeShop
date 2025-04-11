@@ -134,35 +134,7 @@ namespace KringeShopWebClient.Services
         //    }
         //}
 
-        public async Task AddProductToBasket(BasketItemDTO basketItem)
-        {
-            try
-            {
-                string json = JsonSerializer.Serialize(basketItem);
-                var responce = await client.PostAsync("BasketItems", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
-                    };
-                }
-                else CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = true,
-                    Message = "Товар добавлен в корзину"
-                };
-            }
-            catch (Exception ex)
-            {
-                CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = false,
-                    Message = "Ошибка: " + ex.Message
-                };
-            }
-        }
+       
 
         public async Task<List<BasketItemDTO>> GetBasketItems(int user_id)
         {
