@@ -1,0 +1,43 @@
+﻿@page "/product/{productId:int}"
+@rendermode InteractiveServer
+
+@using KringeShopLib.Model
+@using KringeShopWebClient.Services
+
+@inject CustomerService customerService;
+
+@if(Product!=null)
+{
+    <div class="container">
+        <div class="product-card">
+            <img src="" alt="тут должна быть фотка" class="product-image">
+            <h2 class="product-title">@Product.Name</h2>
+            <p class="product-description">@Product.Description</p>
+            <span class="product-price">@Product.Price ₽</span>
+        </div>
+        <AuthorizeView Roles="user">
+            <Authorized>
+                <button class="buy-button">
+                    <i class="bi bi-basket"></i>
+                </button>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+}
+else
+{
+    <p>Что то пошло не так :( Продукт: @ProductId</p>
+}
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private ProductDTO Product;
+
+    protected override Task OnInitializedAsync() => LoadData();
+
+    private async Task LoadData()
+    {
+        Product = await customerService.GetProductDetails(ProductId);
+    }
+}

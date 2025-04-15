@@ -1,0 +1,56 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #fce4ec; 
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.product-card {
+    text-align: center;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.product-title {
+    font-size: 24px;
+    color: #d81b60; /* Темно-розовый цвет */
+}
+
+.product-description {
+    font-size: 16px;
+    color: #555; /* Серый цвет текста */
+}
+
+.product-price {
+    font-size: 20px;
+    color: #d5006d; /* Ярко-розовый цвет */
+    margin: 10px 0;
+}
+
+.buy-button {
+    background-color: #d81b60; /* Темно-розовая кнопка */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+    .buy-button:hover {
+        background-color: #c2185b; /* Более светлый оттенок при наведении */
+    }

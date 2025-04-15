@@ -76,12 +76,22 @@ namespace KringeShopApi.Controllers
         {
             var product = await _context.Products.FindAsync(id);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
+            ProductType type = await _context.ProducTtypes.FirstOrDefaultAsync(t => t.Id == product.TypeId);
+            if (type == null) return NotFound();    
 
-            return Ok(product);
+            ProductDTO result = new ProductDTO()
+            {
+                Id= product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                TypeId = product.TypeId,
+                Type=type.Title,
+                Price = product.Price,
+                Count = product.Count,
+                TimeBought = product.TimeBought
+            };
+            return Ok(result);
         }
 
         // PUT: api/Products/5

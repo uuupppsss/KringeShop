@@ -13,22 +13,23 @@
     <Authorized>
         @if(basketItems!=null)
         {
-            if(basketItems.Count!=null)
+            if(basketItems.Count!=0)
             {
-                    <div>
+                <div class="basket-container">
                     @foreach (var basketItem in basketItems)
                     {
-                        <div style="display:flex; margin:5px">
+                        <div class="basket-item">
                             <p>@basketItem.ProductName</p>
                             <button @onclick="()=>IncrementItemCount(basketItem)">+</button>
                             <p>@basketItem.Count</p>
                             <button @onclick="()=>DecrementItemCount(basketItem)"> -</button>
                             <p>@basketItem.Cost</p>
-                            <p>рублей</p>
+                            <p>₽</p>
                             <button>Удалить</button>
+                            <button @onclick="()=>GoToDetails(basketItem.ProductId)">...</button>
                         </div>
                     }
-                    <button>Оформить заказ</button>
+                    <button @onclick="CreateOrder">Оформить заказ</button>
                     </div>
             }
             else
@@ -75,7 +76,12 @@
         nav.NavigateTo("/SignIn");
     }
 
-    private async void IncrementItemCount(BasketItemDTO basketItem)
+    private async void DeleteBasketItem()
+    {
+
+    }
+
+    private async Task IncrementItemCount(BasketItemDTO basketItem)
     {
         int maxCount = await customerService.GetBasketItemMaxCount(basketItem.Id);
         if(basketItem.Count<maxCount)
@@ -83,25 +89,35 @@
             decimal price = basketItem.Cost / basketItem.Count;
             basketItem.Count++;
             basketItem.Cost = price * basketItem.Count;
-            await customerService.UpdateBasketItem(basketItem);
+            await UpdateBasket(basketItem);
         }
 
     }
 
-    private async void DeleteBasketItem()
-    {
-        
-    }
 
-    private async void DecrementItemCount(BasketItemDTO basketItem)
+    private async Task DecrementItemCount(BasketItemDTO basketItem)
     {
         if(basketItem.Count>1)
         {
             decimal price = basketItem.Cost / basketItem.Count;
             basketItem.Count--;
             basketItem.Cost = price * basketItem.Count;
-            await customerService.UpdateBasketItem(basketItem);
-            StateHasChanged();
+            await UpdateBasket(basketItem);
         }
+    }
+
+    private async Task UpdateBasket(BasketItemDTO basketItem)
+    {
+        await customerService.UpdateBasketItem(basketItem);
+    }
+
+    private void GoToDetails(int product_id)
+    {
+        nav.NavigateTo($"product/{product_id}");
+    }
+
+    private async void CreateOrder()
+    {
+
     }
 }

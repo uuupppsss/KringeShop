@@ -99,6 +99,37 @@ namespace KringeShopWebClient.Services
             }
         }
 
+        public async Task<HashSet<int>> GetProductsInBasket(string username)
+        {
+            List<BasketItemDTO> basket = await GetUserBasket(username);
+            HashSet<int> result = new HashSet<int>();
+            foreach (var product in basket)
+            {
+                result.Add(product.ProductId);
+            }
+            return result;
+        }
+
+        public async Task<ProductDTO> GetProductDetails(int product_id)
+        {
+            try
+            {
+                var responce = await client.GetAsync($"Products/{product_id}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                else
+                {
+                    return await responce.Content.ReadFromJsonAsync<ProductDTO>();
+                    //успех
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
     }
 }
