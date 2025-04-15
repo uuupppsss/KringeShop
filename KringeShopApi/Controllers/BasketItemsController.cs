@@ -29,7 +29,7 @@ namespace KringeShopApi.Controllers
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user is null) return NotFound();
             int user_id = user.Id;
-            List<BasketItem> basketItems= await _context.BasketItems.Where(b=>b.UserId==user_id).ToListAsync();
+            List<BasketItem> basketItems= await _context.BasketItems.Where(b=>b.UserId==user_id).Include(b=>b.Product).ToListAsync();
             List<BasketItemDTO> result = new();
             if (basketItems.Count != 0)
             {
@@ -40,6 +40,7 @@ namespace KringeShopApi.Controllers
                         Id = item.Id,
                         UserId = user_id,
                         ProductId = item.ProductId,
+                        ProductName=item.Product.Name,
                         Count = item.Count,
                         Cost = item.Cost
                     });
@@ -64,14 +65,24 @@ namespace KringeShopApi.Controllers
 
         // PUT: api/BasketItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutBasketItem(int id, int count)
+        [HttpPut]
+        public async Task<IActionResult> PutBasketItem(BasketItemDTO basketItem)
         {
-            BasketItem basketItem = await _context.BasketItems.FirstOrDefaultAsync(b => b.Id == id);
-            if (basketItem == null) return BadRequest();
+            Product product = await _context.Products.FirstOrDefaultAsync(product => product.Id == basketItem.ProductId);
+            if (product == null) return NotFound();
 
-            basketItem.Count = count;
-            _context.Entry(basketItem).State = EntityState.Modified;
+            if (basketItem.Count > product.Count) return NoContent();
+
+            BasketItem found_basketItem = await _context.BasketItems.FirstOrDefaultAsync(b => b.Id == basketItem.Id);
+            if (basketItem == null) return NotFound();
+
+            User user = await _context.Users.FirstOrDefaultAsync(user => user.Id == basketItem.UserId);
+            if (user == null) return NotFound();
+
+            found_basketItem.Count = basketItem.Count;
+            found_basketItem.Cost = basketItem.Cost;
+
+            //_context.Entry(basketItem).State = EntityState.Modified;
 
             try
             {
@@ -79,17 +90,17 @@ namespace KringeShopApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BasketItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+            //    if (!BasketItemExists(id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
             }
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/BasketItems
@@ -139,6 +150,16 @@ namespace KringeShopApi.Controllers
         private bool BasketItemExists(int id)
         {
             return _context.BasketItems.Any(e => e.Id == id);
+        }
+
+        [HttpGet("GetMaxCount/{id}")]
+        public async Task<ActionResult<int>> GetBasketItemMaxCount(int id)
+        {
+            BasketItem basketItem=await _context.BasketItems.FirstOrDefaultAsync(e => e.Id == id);
+            if (basketItem == null) return NotFound();
+            Product product = await _context.Products.FirstOrDefaultAsync(p => p.Id == basketItem.ProductId);
+            if (product == null) return NotFound();
+            return Ok(product.Count);
         }
     }
 }

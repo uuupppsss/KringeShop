@@ -136,75 +136,75 @@ namespace KringeShopWebClient.Services
 
        
 
-        public async Task<List<BasketItemDTO>> GetBasketItems(int user_id)
-        {
-            try
-            {
-                var responce = await client.GetAsync($"BasketItems/GetUsersBasketItems/{user_id}");
-                if (!responce.IsSuccessStatusCode)
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
-                    };
-                    return null;
-                }
-                else
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = true,
-                    };
-                    return await responce.Content.ReadFromJsonAsync<List<BasketItemDTO>>();
-                }
-            }
-            catch (Exception ex)
-            {
+        //public async Task<List<BasketItemDTO>> GetBasketItems(int user_id)
+        //{
+        //    try
+        //    {
+        //        var responce = await client.GetAsync($"BasketItems/GetUsersBasketItems/{user_id}");
+        //        if (!responce.IsSuccessStatusCode)
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+        //            };
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = true,
+        //            };
+        //            return await responce.Content.ReadFromJsonAsync<List<BasketItemDTO>>();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = false,
-                    Message = "Ошибка: " + ex.Message
-                };
-                return null;
-            }
-        }
+        //        CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ошибка: " + ex.Message
+        //        };
+        //        return null;
+        //    }
+        //}
 
-        public async Task SignUp(UserDTO user)
-        {
-            try
-            {
-                user.RoleId = 2;
-                string json = JsonSerializer.Serialize(user);
-                var responce = await client.PostAsync("Auth", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = false,
-                        Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
-                    };
-                }
-                else
-                {
-                    CurrentOperationResult = new OperationResult()
-                    {
-                        IsSuccess = true,
-                        Message= $"Регистрация прошла успешно! Выполните вход в систему"
-                    };
-                }
+        //public async Task SignUp(UserDTO user)
+        //{
+        //    try
+        //    {
+        //        user.RoleId = 2;
+        //        string json = JsonSerializer.Serialize(user);
+        //        var responce = await client.PostAsync("Auth", new StringContent(json, Encoding.UTF8, "application/json"));
+        //        if (!responce.IsSuccessStatusCode)
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Ошибка сервера: " + responce.StatusCode.ToString() + await responce.Content.ReadAsStringAsync()
+        //            };
+        //        }
+        //        else
+        //        {
+        //            CurrentOperationResult = new OperationResult()
+        //            {
+        //                IsSuccess = true,
+        //                Message= $"Регистрация прошла успешно! Выполните вход в систему"
+        //            };
+        //        }
 
-            }
-            catch (Exception ex)
-            {
-                CurrentOperationResult = new OperationResult()
-                {
-                    IsSuccess = false,
-                    Message = "Ошибка: " + ex.Message
-                };
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        CurrentOperationResult = new OperationResult()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ошибка: " + ex.Message
+        //        };
+        //    }
+        //}
 
         //public async Task<UserDTO> SignIn(string username, string password)
         //{

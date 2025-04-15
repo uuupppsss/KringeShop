@@ -15,15 +15,21 @@
         {
             if(basketItems.Count!=null)
             {
+                    <div>
                     @foreach (var basketItem in basketItems)
                     {
-                    <div style="display:flex; margin:5px">
-                        <p>@basketItem.Count</p>
-                        <p>шт.</p>
-                        <p>@basketItem.Cost</p>
-                        <p>рублей</p>
-                    </div>
+                        <div style="display:flex; margin:5px">
+                            <p>@basketItem.ProductName</p>
+                            <button @onclick="()=>IncrementItemCount(basketItem)">+</button>
+                            <p>@basketItem.Count</p>
+                            <button @onclick="()=>DecrementItemCount(basketItem)"> -</button>
+                            <p>@basketItem.Cost</p>
+                            <p>рублей</p>
+                            <button>Удалить</button>
+                        </div>
                     }
+                    <button>Оформить заказ</button>
+                    </div>
             }
             else
             {
@@ -67,5 +73,35 @@
     private void SignIn()
     {
         nav.NavigateTo("/SignIn");
+    }
+
+    private async void IncrementItemCount(BasketItemDTO basketItem)
+    {
+        int maxCount = await customerService.GetBasketItemMaxCount(basketItem.Id);
+        if(basketItem.Count<maxCount)
+        {
+            decimal price = basketItem.Cost / basketItem.Count;
+            basketItem.Count++;
+            basketItem.Cost = price * basketItem.Count;
+            await customerService.UpdateBasketItem(basketItem);
+        }
+
+    }
+
+    private async void DeleteBasketItem()
+    {
+        
+    }
+
+    private async void DecrementItemCount(BasketItemDTO basketItem)
+    {
+        if(basketItem.Count>1)
+        {
+            decimal price = basketItem.Cost / basketItem.Count;
+            basketItem.Count--;
+            basketItem.Cost = price * basketItem.Count;
+            await customerService.UpdateBasketItem(basketItem);
+            StateHasChanged();
+        }
     }
 }
