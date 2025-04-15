@@ -1,0 +1,78 @@
+﻿@page "/AddProduct"
+@rendermode InteractiveServer
+
+@using KringeShopWebClient.Model
+@using KringeShopLib.Model
+@using System.Net.Http.Headers
+@using KringeShopWebClient.Services
+@using KringeShopWebClient.Extention
+
+@inject AdminService adminService
+@inject IJSRuntime js
+
+<h3>Добавить продукт</h3>
+
+<EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Название:</label>
+        <InputText @bind-Value="product.Name" />
+    </div>
+    <div>
+        <label>Описание:</label>
+        <InputTextArea @bind-Value="product.Description" />
+    </div>
+    <div>
+        <label>Цена:</label>
+        <InputNumber @bind-Value="product.Price" />
+    </div>
+    <div>
+        <label>Изображение:</label>
+        <InputFile OnChange="HandleFileSelected" />
+    </div>
+
+    <button type="submit">Показать картинку</button>
+</EditForm>
+@if (imageBase64 != null)
+{
+    <img src="@($"data:image/png;base64,{imageBase64}")" alt="Изображение" class="scaled-image" />
+}
+
+<style>
+    .scaled-image {
+        transform: scale(0.2); 
+        transform-origin: top left; 
+    }
+</style>
+@code {
+    private ProductDTO product;
+
+    private string? imageBase64;
+
+    protected override void OnInitialized()
+    {
+        product = new ProductDTO();
+        base.OnInitialized();
+    }
+    private async Task HandleValidSubmit()
+    {
+        byte[] imageData = product.Image; // массив байтов
+        imageBase64 = Convert.ToBase64String(imageData);
+        StateHasChanged();
+    }
+
+    private async void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles(1).FirstOrDefault();
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); //  5 МБ
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            product.Image = memoryStream.ToArray(); // Сохранение изображения в виде массива байтов
+        }
+    }
+
+}

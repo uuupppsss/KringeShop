@@ -36,6 +36,7 @@ namespace KringeShopWebClient
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<CustomerService>();
+            builder.Services.AddSingleton<AdminService>();
 
             var app = builder.Build();
 

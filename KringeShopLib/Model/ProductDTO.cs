@@ -23,5 +23,7 @@ namespace KringeShopLib.Model
 
         public int TimeBought { get; set; }
 
+        public byte[]? Image { get; set; }
+
     }
 }

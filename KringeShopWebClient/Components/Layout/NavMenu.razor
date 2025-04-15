@@ -25,13 +25,18 @@
                 <span aria-hidden="true" ></span> Корзина
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/AddProduct">
+                <span aria-hidden="true"></span> Добавить продукт
+            </NavLink>
+        </div>
         <AuthorizeView Roles="user,admin">
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="/">
                         <span aria-hidden="true"></span> Выйти
                     </NavLink>
-                </div>
+                </div> 
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
