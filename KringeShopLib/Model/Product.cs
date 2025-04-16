@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 
 namespace KringeShopLib.Model;
@@ -22,6 +23,8 @@ public partial class Product
     public virtual ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
     public virtual ICollection<SavedProduct> SavedProducts { get; set; } = new List<SavedProduct>();
 

@@ -77,7 +77,7 @@ namespace KringeShopApi.Controllers
             var product = await _context.Products.FindAsync(id);
 
             if (product == null) return NotFound();
-            ProductType type = await _context.ProducTtypes.FirstOrDefaultAsync(t => t.Id == product.TypeId);
+            ProductType type = await _context.ProductTypes.FirstOrDefaultAsync(t => t.Id == product.TypeId);
             if (type == null) return NotFound();    
 
             ProductDTO result = new ProductDTO()
