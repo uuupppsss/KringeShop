@@ -24,6 +24,7 @@ namespace KringeShopLib.Model
         public int TimeBought { get; set; }
 
         public byte[]? Image { get; set; }
+        //public List<string>? Images { get; set; } = null;
 
     }
 }

@@ -29,11 +29,16 @@
         <InputNumber @bind-Value="product.Price" />
     </div>
     <div>
+        <label>Количество:</label>
+        <InputNumber @bind-Value="product.Count" />
+    </div>
+    <div>
         <label>Изображение:</label>
         <InputFile OnChange="HandleFileSelected" />
     </div>
 
-    <button type="submit">Показать картинку</button>
+    <button type="submit">Сохранить</button>
+    <button @onclick="ShowPhoto">Показать картинку</button>
 </EditForm>
 @if (imageBase64 != null)
 {
@@ -56,11 +61,17 @@
         product = new ProductDTO();
         base.OnInitialized();
     }
-    private async Task HandleValidSubmit()
+
+    private async Task ShowPhoto()
     {
         byte[] imageData = product.Image; // массив байтов
         imageBase64 = Convert.ToBase64String(imageData);
         StateHasChanged();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        
     }
 
     private async void HandleFileSelected(InputFileChangeEventArgs e)

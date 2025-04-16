@@ -129,15 +129,43 @@ namespace KringeShopApi.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         [HttpPost]
-        public async Task<ActionResult> PostProduct(Product product)
+        public async Task<ActionResult<int>> PostProduct(ProductDTO sent_product)
         {
+            Product product = new Product()
+            {
+                Name=sent_product.Name,
+                Description=sent_product.Description,
+                TypeId=sent_product.TypeId,
+                Price=sent_product.Price,
+                Count=sent_product.Count,
+                TimeBought=0
+            };
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            if (await _context.Products.ContainsAsync(product)) return Ok();
+            if (await _context.Products.ContainsAsync(product)) return Ok(product.Id);
             else return BadRequest("Что то пошло не так");
+        }
+
+        [HttpPost("Images/{product_id}")]
+        public async Task<ActionResult> PostProductImages(int product_id, List<byte[]> images)
+        {
+            Product product = await _context.Products.FirstOrDefaultAsync(p => p.Id == product_id);
+            if (product is null) return NotFound();
+
+            foreach(var image in images)
+            {
+                _context.ProductImages.Add(new ProductImage()
+                {
+                    ProductId=product_id,
+                    Product=product,
+                    Image=image
+                });
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // DELETE: api/Products/5

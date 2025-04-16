@@ -1,4 +1,6 @@
-﻿namespace KringeShopWebClient.Services
+﻿using KringeShopLib.Model;
+
+namespace KringeShopWebClient.Services
 {
     public class AdminService
     {
@@ -7,14 +9,12 @@
         {
             client = Client.HttpClient;
         }
-        //public async Task<string?> UploadProductImage(MultipartFormDataContent content)
-        //{
-        //    //var response = await client.PostAsync("Products/Upload", content);
-        //    //if (response.IsSuccessStatusCode)
-        //    //{
-        //    //    return await response.Content.ReadAsStringAsync();
-        //    //}
-        //    //else return null;
-        //}
+       
+        public async Task AddProduct(ProductDTO product, List<byte[]> images)
+        {
+
+        }
+
+
     }
 }
