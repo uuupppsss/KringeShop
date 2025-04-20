@@ -4,9 +4,9 @@ using KringeShopApi.Model;
 using Microsoft.AspNetCore.Mvc;
 using KringeShopApi.HomeModel;
 
-namespace KringeShopApi
+namespace KringeShopApi.Hubs
 {
-    public class ClientsHub:Hub
+    public class ClientsHub : Hub
     {
         private KrinageShopDbContext _context;
         public ClientsHub(KrinageShopDbContext context)

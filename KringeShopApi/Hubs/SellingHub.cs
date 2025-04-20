@@ -2,7 +2,7 @@
 using KringeShopLib.Model;
 using KringeShopApi.Model;
 
-namespace KringeShopApi
+namespace KringeShopApi.Hubs
 {
     //public class SellingHub:Hub
     //{

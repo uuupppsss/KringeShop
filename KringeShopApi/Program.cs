@@ -1,5 +1,5 @@
-using KringeShopApi;
 using KringeShopApi.HomeModel;
+using KringeShopApi.Hubs;
 using KringeShopApi.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

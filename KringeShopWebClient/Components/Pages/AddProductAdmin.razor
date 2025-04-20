@@ -37,14 +37,18 @@
         <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
 
     </div>
+    <div>
+        <label>Категория:</label>
+        <select @bind="selectedTypeId">
+            @foreach(var type in types)
+            {
+                <option value="@type.Id">@type.Title</option>
+            }
+        </select>
+    </div>
 
     <button type="submit">Сохранить</button>
-    <button @onclick="ShowPhoto">Показать картинку</button>
 </EditForm>
-@if (imageBase64 != null)
-{
-    <img src="@($"data:image/png;base64,{imageBase64}")" alt="Изображение" class="scaled-image" />
-}
 
 <style>
     .scaled-image {
@@ -55,26 +59,19 @@
 @code {
     private ProductDTO product;
     private List<byte[]> productPhotos;
-    private string? imageBase64;
-    private ElementReference fileInput;
+    private int selectedTypeId;
+    private List<ProductTypeDTO> types;
 
     protected override void OnInitialized()
     {
         product = new ProductDTO();
+        types = new List<ProductTypeDTO>
+        {
+            new ProductTypeDTO{Id=1,Title="первый тип"},
+            new ProductTypeDTO{Id=1,Title="второй тип"},
+            new ProductTypeDTO{Id=1,Title="третий тип"}
+        };
         base.OnInitialized();
-    }
-
-    // private async Task OpenFileDialog()
-    // {
-    //     await fileInput.FocusAsync(); // Фокусируемся на элементе input
-    //     fileInput.Click(); // Открываем диалог выбора файлов
-    // }
-
-    private async Task ShowPhoto()
-    {
-        // byte[] imageData = product.Image; // массив байтов
-        // imageBase64 = Convert.ToBase64String(imageData);
-        // StateHasChanged();
     }
 
     private async Task HandleValidSubmit()
@@ -86,16 +83,6 @@
 
     private async void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        // var file = e.GetMultipleFiles(1).FirstOrDefault();
-        // if (file != null)
-        // {
-        //     using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); //  5 МБ
-        //     using var memoryStream = new MemoryStream();
-        //     await stream.CopyToAsync(memoryStream);
-        //     string stringImg = Convert.ToBase64String(memoryStream.ToArray());
-        //     product.Images = new List<string> { stringImg };
-        // } // Сохранение изображения в виде массива байтов
-
         productPhotos = new();
         var files = e.GetMultipleFiles(5); // Получаем 5 картинок
         if (files != null && files.Count > 0)
@@ -108,10 +95,6 @@
                 productPhotos.Add(memoryStream.ToArray());
             }
         }
-    }
-    private void HandleFilesSelected(ChangeEventArgs e)
-    {
-        throw new NotImplementedException();
     }
 }
 

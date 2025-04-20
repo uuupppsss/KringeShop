@@ -24,11 +24,11 @@
 
 .carousel-images {
     overflow: hidden;
-    width: 200px; /* Задайте ширину контейнера */
+    width: 200px; 
 }
 
     .carousel-images img {
-        width: 100%; /* Изображения занимают всю ширину контейнера */
+        width: 100%;
     }
 
 .image-btn {
