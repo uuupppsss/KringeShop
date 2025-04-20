@@ -17,3 +17,22 @@
     .product-item button {
         margin-top: 10px;
     }
+.image-carousel {
+    display: flex;
+    align-items: center;
+}
+
+.carousel-images {
+    overflow: hidden;
+    width: 200px; /* Задайте ширину контейнера */
+}
+
+    .carousel-images img {
+        width: 100%; /* Изображения занимают всю ширину контейнера */
+    }
+
+.image-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}

@@ -30,7 +30,7 @@ namespace KringeShopApi.Controllers
         {
             List<ProductDTO> result = new List<ProductDTO>();
             List<Product> products = new();
-           products = await _context.Products.ToListAsync();
+           products = await _context.Products.Include(p=>p.ProductImages).ToListAsync();
             foreach (var product in products)
             {
                 result.Add(new ProductDTO()
@@ -42,8 +42,16 @@ namespace KringeShopApi.Controllers
                     Price= product.Price,
                     Count= product.Count,
                     TimeBought= product.TimeBought,
-                    Images=product.ProductImages.Select(x => Convert.ToBase64String(x.Image)).ToList()
+                    Images=product.ProductImages.Select(x => Convert.ToBase64String(x.Image)).ToList(),
+                    //CurrentImage= product.ProductImages.Select(x => Convert.ToBase64String(x.Image)).ToList().First()
                 });
+            }
+            foreach (var r in result)
+            {
+                if(r.Images!=null&&r.Images.Count!=0)
+                {
+                    r.CurrentImage = r.Images[0];
+                }
             }
             return Ok(result);
         }

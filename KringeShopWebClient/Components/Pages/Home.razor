@@ -48,7 +48,16 @@
         @foreach (var product in products)
         {
             <div class="product-item">
-                <img />
+                <div class="image-carousel">
+                    <button @onclick="() => PreviousImage(product)" class="image-btn">&#10094;</button>
+                    <div class="carousel-images">
+                        @foreach (var image in product.Images)
+                        {
+                            <img src="@($"data:image/png;base64,{image}")" style="display: @(image == product.CurrentImage ? "block" : "none")" />
+                        }
+                    </div>
+                    <button @onclick="() => NextImage(product)" class="image-btn">&#10095;</button>
+                </div>
                 <h4>@product.Name</h4>
                 <p>@product.Description</p>
                 <p>Цена: @product.Price.ToString("C") </p>
@@ -56,7 +65,6 @@
                 <AuthorizeView Roles="user">
                     <Authorized>
                         <div style="display:flex;">
-
                             <button @onclick="() => BasketButtonClick(product)" class="@GetButtonClass(product)">
                                 <i class="bi bi-basket"></i>
                             </button>
@@ -77,6 +85,31 @@
 
     private HashSet<int> basketProducts = new HashSet<int>();
 
+    private void PreviousImage(ProductDTO product)
+    {
+        if(product.Images!=null&&product.Images.Count>0)
+        {
+            var currentIndex = product.Images.IndexOf(product.CurrentImage);
+            if (currentIndex > 0)
+            {
+                product.CurrentImage = product.Images[currentIndex - 1];
+            }
+            else product.CurrentImage = product.Images[currentIndex + 1];
+        }
+    }
+
+    private void NextImage(ProductDTO product)
+    {
+        if (product.Images != null && product.Images.Count > 0)
+        {
+            var currentIndex = product.Images.IndexOf(product.CurrentImage);
+            if (currentIndex < product.Images.Count - 1)
+            {
+                product.CurrentImage = product.Images[currentIndex + 1];
+            }
+            else product.CurrentImage = product.Images[currentIndex - 1];
+        }
+    }
 
     private async void TestToast()
     {
@@ -93,11 +126,6 @@
     {
         await jsruntime.ToastrError(message);
     }
-
-    // private async void TestToast()
-    // {
-    //     await jsruntime.ToastrSuccess("Оао ммм)");
-    // }
 
     protected override Task OnInitializedAsync() => LoadData();
     private string GetButtonClass(ProductDTO product)
