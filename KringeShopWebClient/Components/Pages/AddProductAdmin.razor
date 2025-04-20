@@ -64,15 +64,15 @@
 
     private async Task ShowPhoto()
     {
-        byte[] imageData = product.Image; // массив байтов
-        imageBase64 = Convert.ToBase64String(imageData);
-        StateHasChanged();
+        // byte[] imageData = product.Image; // массив байтов
+        // imageBase64 = Convert.ToBase64String(imageData);
+        // StateHasChanged();
     }
 
     private async Task HandleValidSubmit()
     {
         product.TypeId = 1;
-        await adminService.AddProduct(product, new List<byte[]> {product.Image});
+        await adminService.AddProduct(product, new List<byte[]> {product.Images});
     }
 
     private async void HandleFileSelected(InputFileChangeEventArgs e)
@@ -83,7 +83,7 @@
             using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); //  5 МБ
             using var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
-            product.Image = memoryStream.ToArray(); // Сохранение изображения в виде массива байтов
+            product.Images = memoryStream.ToArray(); // Сохранение изображения в виде массива байтов
         }
     }
 

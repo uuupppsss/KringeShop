@@ -28,9 +28,10 @@ namespace KringeShopWebClient.Services
                 {
                     addedProductId = await responce.Content.ReadFromJsonAsync<int>();
                     string images_json = JsonSerializer.Serialize(images);
-                    var images_responce = await client.PostAsync($"Products/Images{addedProductId}", new StringContent(images_json, Encoding.UTF8, "application/json"));
+                    var images_responce = await client.PostAsync($"Products/Images/{addedProductId}", new StringContent(images_json, Encoding.UTF8, "application/json"));
                     if (!images_responce.IsSuccessStatusCode)
                     {
+                        string error= await images_responce.Content.ReadAsStringAsync();
                         //ошибка
                     }
                     else

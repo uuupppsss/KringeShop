@@ -15,6 +15,7 @@ namespace KringeShopLib.Model
         public string? Description { get; set; }
 
         public int TypeId { get; set; }
+
         public string? Type {  get; set; }
 
         public decimal Price { get; set; }
@@ -23,8 +24,9 @@ namespace KringeShopLib.Model
 
         public int TimeBought { get; set; }
 
-        public byte[]? Image { get; set; }
-        //public List<string>? Images { get; set; } = null;
+        public List<string>? Images { get; set; } = null;
+
+        public string? CurrentImage { get; set; } = null;
 
     }
 }
