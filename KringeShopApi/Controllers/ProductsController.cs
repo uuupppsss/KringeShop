@@ -159,9 +159,9 @@ namespace KringeShopApi.Controllers
             {
                 _context.ProductImages.Add(new ProductImage()
                 {
-                    ProductId=product_id,
-                    Product=product,
-                    Image=image
+                    ProductId = product_id,
+                    Product = product,
+                    Image = image
                 });
             }
             await _context.SaveChangesAsync();

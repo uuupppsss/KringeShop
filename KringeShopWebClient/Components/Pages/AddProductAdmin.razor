@@ -71,7 +71,8 @@
 
     private async Task HandleValidSubmit()
     {
-        
+        product.TypeId = 1;
+        await adminService.AddProduct(product, new List<byte[]> {product.Image});
     }
 
     private async void HandleFileSelected(InputFileChangeEventArgs e)
