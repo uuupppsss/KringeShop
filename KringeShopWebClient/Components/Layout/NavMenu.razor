@@ -1,5 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @using System.Security.Claims;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using KringeShopWebClient.Model;
+
+@inject ProtectedSessionStorage ProtectedSessionStorage
 <CascadingAuthenticationState>
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -55,10 +59,23 @@
 
     protected override Task OnInitializedAsync() => LoadData();
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        string username;
+        var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
+        if (result.Success) username = result.Value.Username;
+        else username = " ";
+        //return base.OnAfterRenderAsync(firstRender);
+    }
     private async Task LoadData()
     {
-        var auth = await authenticationState;
-        authUser = auth.User;
+        // var auth = await authenticationState;
+        // authUser = auth.User;
+        // string username;
+        // var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
+        // if (result.Success) username = result.Value.Username;
+        // else username = " ";
+
     }
 }
 
