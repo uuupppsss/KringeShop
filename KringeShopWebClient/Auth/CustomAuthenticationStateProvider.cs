@@ -43,17 +43,19 @@ namespace KringeShopWebClient.Auth
                 await _sessionStorage.SetAsync("UserSession", userSession);
                 claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, userSession.Username),
-                    new Claim(ClaimTypes.Role, userSession.Role),
-                }));
+                   new Claim(ClaimTypes.Name, userSession.Username),
+                   new Claim(ClaimTypes.Role, userSession.Role),
+                }, "CustomAuth"));
             }
             else
             {
                 await _sessionStorage.DeleteAsync("UserSession");
-                claimsPrincipal=_anonymous;
+                claimsPrincipal = _anonymous;
             }
-            NotifyAuthenticationStateChanged
-                (Task.FromResult(new AuthenticationState(claimsPrincipal)));
+
+            var authState = new AuthenticationState(claimsPrincipal);
+            NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
+
     }
 }

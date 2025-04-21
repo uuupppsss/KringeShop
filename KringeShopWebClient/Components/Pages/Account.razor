@@ -5,14 +5,16 @@
 @using KringeShopLib.Model
 @using KringeShopWebClient.Components.Layout
 @using KringeShopWebClient.Extention
+@using KringeShopWebClient.Auth
 
+@inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager nav;
 @inject UserService userSerice;
 @inject IJSRuntime js;
 
 <h3>Личный кабинет</h3>
 
-    <AuthorizeView Roles="user">
+    <AuthorizeView Roles="user,admin">
         <Authorized>
         <div class="center-container">
             <div class="auth-container">
@@ -104,9 +106,11 @@
         nav.NavigateTo("SignUp");
     }
 
-    private void SignOut()
+    private async void SignOut()
     {
-
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        nav.NavigateTo("/", true);
     }
 
     private void RemoveAccount()
