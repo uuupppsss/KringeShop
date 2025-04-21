@@ -40,9 +40,12 @@
     <div>
         <label>Категория:</label>
         <select @bind="selectedTypeId">
-            @foreach(var type in types)
+            @if (!(types is null) && types.Count != 0)
             {
-                <option value="@type.Id">@type.Title</option>
+                foreach (var type in types)
+                {
+                    <option value="@type.Id">@type.Title</option>
+                }
             }
         </select>
     </div>
@@ -57,28 +60,24 @@
     }
 </style>
 @code {
-    private ProductDTO product;
+    private ProductDTO product=new ProductDTO();
     private List<byte[]> productPhotos;
     private int selectedTypeId;
     private List<ProductTypeDTO> types;
 
-    protected override void OnInitialized()
-    {
-        product = new ProductDTO();
-        types = new List<ProductTypeDTO>
-        {
-            new ProductTypeDTO{Id=1,Title="первый тип"},
-            new ProductTypeDTO{Id=1,Title="второй тип"},
-            new ProductTypeDTO{Id=1,Title="третий тип"}
-        };
-        base.OnInitialized();
-    }
+    protected override async Task OnInitializedAsync() => LoadData();
 
     private async Task HandleValidSubmit()
     {
         //отладка!!!
-        product.TypeId = 1;
+        product.TypeId = selectedTypeId;
         await adminService.AddProduct(product, productPhotos);
+    }
+
+    private async Task LoadData()
+    {
+        types = await adminService.GetTypesList();
+        StateHasChanged();
     }
 
     private async void HandleFileSelected(InputFileChangeEventArgs e)
