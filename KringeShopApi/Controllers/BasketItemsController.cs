@@ -119,8 +119,8 @@ namespace KringeShopApi.Controllers
                 ProductId = sent_basketItem.ProductId,
                 Cost = sent_basketItem.Cost,
                 Count = sent_basketItem.Count,
-                Product = product,
-                User = user
+                //Product = product,
+                //User = user
             };
             _context.BasketItems.Add(basketItem);
             await _context.SaveChangesAsync();

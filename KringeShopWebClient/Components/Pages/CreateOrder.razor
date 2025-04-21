@@ -1,0 +1,54 @@
+﻿@page "/CreateOrder"
+@rendermode InteractiveServer
+
+@using KringeShopLib.Model
+@using KringeShopWebClient.Services
+
+@inject CustomerService customerService;
+
+<EditForm Model="@order" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="address">Адрес</label>
+        <InputText id="address" class="form-control" @bind-Value="order.Adress" />
+        <ValidationMessage For="@(() => order.Adress)" />
+    </div>
+
+    <div class="form-group">
+        <label for="isSelfPickUp">Самовывоз</label>
+        <InputCheckbox id="isSelfPickUp" @bind-Value="order.IsSelfPickUp" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать заказ</button>
+</EditForm>
+
+@code {
+    private OrderDTO order;
+    protected override void OnInitialized()
+    {
+        order = new OrderDTO();
+        base.OnInitialized();
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        order.CreateDate = DateTime.Now;
+
+        //debug
+        order.RecieveDate = DateTime.MinValue;
+        order.FullCost = 1;
+        order.StatusId = 1;
+        order.IsCmpleted = false;
+        //debug
+
+        var authState = await authenticationState;
+        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
+        await customerService.CreateOrder(authState.User.Identity.Name, order);
+
+    }
+}

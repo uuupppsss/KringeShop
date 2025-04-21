@@ -132,7 +132,28 @@ namespace KringeShopWebClient.Services
             }
         }
 
+        public async Task CreateOrder(string username,OrderDTO order)
+        {
+            try
+            {
+                string json=JsonSerializer.Serialize(order);
+                var responce = await client.PostAsync($"Orders/Create/{username}", new StringContent(json, Encoding.UTF8, "application/json"));
+                if (!responce.IsSuccessStatusCode)
+                {
+                    //ошибка
+                }
+                else
+                {
+                    //успех
+                }
+            }
+            catch
+            {
+                //ошибка
+            }
+        }
 
+        
 
     }
 }
