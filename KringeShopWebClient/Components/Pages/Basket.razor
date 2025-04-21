@@ -25,7 +25,7 @@
                             <button @onclick="()=>DecrementItemCount(basketItem)"> -</button>
                             <p>@basketItem.Cost</p>
                             <p>₽</p>
-                            <button>Удалить</button>
+                            <button @onclick="()=>DeleteBasketItem(basketItem.Id)">Удалить</button>
                             <button @onclick="()=>GoToDetails(basketItem.ProductId)">...</button>
                         </div>
                     }
@@ -76,9 +76,11 @@
         nav.NavigateTo("/SignIn");
     }
 
-    private async void DeleteBasketItem()
+    private async void DeleteBasketItem(int id)
     {
-
+        await customerService.RemoveBasketItem(id);
+        await LoadData();
+        StateHasChanged();
     }
 
     private async Task IncrementItemCount(BasketItemDTO basketItem)

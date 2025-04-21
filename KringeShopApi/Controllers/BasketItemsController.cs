@@ -133,7 +133,7 @@ namespace KringeShopApi.Controllers
 
         // DELETE: api/BasketItems/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBasketItem(int id)
+        public async Task<ActionResult> DeleteBasketItem(int id)
         {
             var basketItem = await _context.BasketItems.FindAsync(id);
             if (basketItem == null)
@@ -144,7 +144,7 @@ namespace KringeShopApi.Controllers
             _context.BasketItems.Remove(basketItem);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool BasketItemExists(int id)

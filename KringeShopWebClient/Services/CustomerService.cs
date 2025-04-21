@@ -49,9 +49,29 @@ namespace KringeShopWebClient.Services
                     //успех
                 };
             }
-            catch (Exception ex)
+            catch 
             {
 
+            }
+        }
+
+        public async Task RemoveBasketItem(int id)
+        {
+            try
+            {
+                var responce = await client.DeleteAsync($"BasketItems/{id}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    //ошибка
+                }
+                else
+                {
+                    //успех
+                };
+            }
+            catch
+            {
+                //ошибка
             }
         }
 

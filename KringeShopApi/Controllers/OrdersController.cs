@@ -112,7 +112,9 @@ namespace KringeShopApi.Controllers
             await _context.SaveChangesAsync();
 
             //добавление товаров в заказ
-            foreach(var item in _context.BasketItems)
+            var userBasket=await _context.BasketItems.Where(b=>b.UserId==user.Id).ToListAsync();
+
+            foreach(var item in userBasket)
             {
                 _context.OrderItems.Add(new OrderItem()
                 {
@@ -121,8 +123,11 @@ namespace KringeShopApi.Controllers
                     Cost=item.Cost,
                     OrdeId=order.Id
                 });
+                _context.BasketItems.Remove(item);
             }
             await _context.SaveChangesAsync();
+
+            
 
             if (await _context.Orders.ContainsAsync(order)) return Ok();
             else return BadRequest("Что-то пошло не так");
