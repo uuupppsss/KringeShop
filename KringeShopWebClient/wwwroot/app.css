@@ -145,3 +145,39 @@ body {
     white-space: nowrap; 
     overflow: hidden; 
 }
+.image-carousel {
+    display: flex;
+    align-items: center;
+}
+
+.carousel-images {
+    overflow: hidden;
+    width: 200px;
+}
+
+    .carousel-images img {
+        width: 100%;
+    }
+
+.image-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.product-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: calc(33% - 20px);
+}
+
+    .product-item h4 {
+        margin: 0;
+    }
+
+    .product-item button {
+        margin-top: 10px;
+    }
+
+   /*менюшка п≈р≈н≈с“и!!!*/

@@ -88,6 +88,7 @@ namespace KringeShopApi.Controllers
             if (product == null) return NotFound();
             ProductType type = await _context.ProductTypes.FirstOrDefaultAsync(t => t.Id == product.TypeId);
             if (type == null) return NotFound();    
+            product.ProductImages=await _context.ProductImages.Where(i=>i.ProductId==product.Id).ToListAsync();
 
             ProductDTO result = new ProductDTO()
             {
@@ -98,8 +99,10 @@ namespace KringeShopApi.Controllers
                 Type=type.Title,
                 Price = product.Price,
                 Count = product.Count,
-                TimeBought = product.TimeBought
+                TimeBought = product.TimeBought,
+                Images= product.ProductImages.Select(x => Convert.ToBase64String(x.Image)).ToList()
             };
+            result.CurrentImage = result.Images[0];
             return Ok(result);
         }
 

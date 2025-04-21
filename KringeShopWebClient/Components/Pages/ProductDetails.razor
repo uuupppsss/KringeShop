@@ -8,37 +8,48 @@
 
 @if(Product!=null)
 {
-    <div class="container">
+    <div class="center-container">
         <div class="product-card">
-            <img src="" alt="тут должна быть фотка" class="product-image">
+            <div class="image-carousel">
+                <button @onclick="() => PreviousImage(Product)" class="image-btn">&#10094;</button>
+                <div class="carousel-images">
+                    @foreach (var image in Product.Images)
+                    {
+                        <img src="@($"data:image/png;base64,{image}")" style="display: @(image == Product.CurrentImage ? "block" : "none")" />
+                    }
+                </div>
+                <button @onclick="() => NextImage(Product)" class="image-btn">&#10095;</button>
+            </div>
             <h2 class="product-title">@Product.Name</h2>
             <p class="product-description">@Product.Description</p>
             <span class="product-price">@Product.Price ₽</span>
             <p>Осталось @Product.Count шт.</p>
+
+            <AuthorizeView Roles="user">
+                <Authorized>
+                    <button class="buy-button">
+                        <i class="bi bi-basket"></i>
+                    </button>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="admin">
+                <Authorized>
+                    <div style="display:flex;">
+
+                        <button>
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <button>
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </div>
+                </Authorized>
+
+            </AuthorizeView>
         </div>
-        <AuthorizeView Roles="user">
-            <Authorized>
-                <button class="buy-button">
-                    <i class="bi bi-basket"></i>
-                </button>
-            </Authorized>
-        </AuthorizeView>
-        <AuthorizeView Roles="admin">
-            <Authorized>
-                <div style="display:flex;">
-
-                    <button>
-                        <i class="bi bi-pencil"></i>
-                    </button>
-
-                    <button>
-                        <i class="bi bi-trash"></i>
-                    </button>
-
-                </div>
-            </Authorized>
-
-        </AuthorizeView>
+        
     </div>
 }
 else
@@ -56,5 +67,31 @@ else
     private async Task LoadData()
     {
         Product = await customerService.GetProductDetails(ProductId);
+    }
+
+    private void PreviousImage(ProductDTO product)
+    {
+        if (product.Images != null && product.Images.Count > 0)
+        {
+            var currentIndex = product.Images.IndexOf(product.CurrentImage);
+            if (currentIndex > 0)
+            {
+                product.CurrentImage = product.Images[currentIndex - 1];
+            }
+            else product.CurrentImage = product.Images[currentIndex + 1];
+        }
+    }
+
+    private void NextImage(ProductDTO product)
+    {
+        if (product.Images != null && product.Images.Count > 0)
+        {
+            var currentIndex = product.Images.IndexOf(product.CurrentImage);
+            if (currentIndex < product.Images.Count - 1)
+            {
+                product.CurrentImage = product.Images[currentIndex + 1];
+            }
+            else product.CurrentImage = product.Images[currentIndex - 1];
+        }
     }
 }
