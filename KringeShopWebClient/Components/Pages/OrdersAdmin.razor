@@ -1,5 +1,64 @@
 ﻿@page "/Orders"
 
-@code {
+@using KringeShopLib.Model
+@using KringeShopWebClient.Services
 
+@inject AdminService adminService;
+
+<h3>Список заказов</h3>
+
+@if (orders == null || orders.Count == 0)
+{
+    <p>Нет доступных заказов.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Адрес</th>
+                <th>Полная стоимость</th>
+                <th>Дата получения</th>
+                <th>Статус</th>
+                <th>Дата создания</th>
+                <th>Завершен</th>
+                <th>Самовывоз</th>
+                <th>Пользователь ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.Adress</td>
+                        <td>@order.FullCost</td>
+                        <td>@order.RecieveDate?.ToString("g")</td>
+                        <td>@order.Status</td>
+                        <td>@order.CreateDate?.ToString("g")</td>
+                        <td>@order.IsCmpleted</td>
+                        <td>@order.IsSelfPickUp</td>
+                        <td>@order.UserId</td>
+                    <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<OrderDTO> orders;
+
+    protected override Task OnInitializedAsync() => LoadData();
+
+    private async Task LoadData()
+    {
+        orders = await adminService.GetOrdersList(1);
+    }
+
+    private async void UpdateOrder(OrderDTO order)
+    {
+        
+    }
 }

@@ -32,23 +32,20 @@
                 <span aria-hidden="true"></span> Корзина
             </NavLink>
         </div>
-            
-            <AuthorizeView Roles="admin">
-                <Authorized>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/AddProduct">
-                            <span aria-hidden="true"></span> Добавить продукт
-                        </NavLink>
-                    </div>
 
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/Orders">
-                            <span aria-hidden="true"></span> Заказы
-                        </NavLink>
-                    </div>
-                </Authorized>
-            </AuthorizeView>
-    </nav>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/AddProduct">
+                    <span aria-hidden="true"></span> Добавить продукт
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/Orders">
+                    <span aria-hidden="true"></span> Заказы
+                </NavLink>
+            </div>
+        </nav>
 </div>
 </CascadingAuthenticationState>
 @code
@@ -61,10 +58,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        string username;
-        var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
-        if (result.Success) username = result.Value.Username;
-        else username = " ";
+        // string username;
+        // var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
+        // if (result.Success) username = result.Value.Username;
+        // else username = " ";
         //return base.OnAfterRenderAsync(firstRender);
     }
     private async Task LoadData()

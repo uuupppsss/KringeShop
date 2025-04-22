@@ -24,18 +24,62 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Orders
-        [Authorize(Roles = "admin")]
-        [HttpGet]
-        public async Task<ActionResult<List<Order>>> GetOrders()
+        //[Authorize(Roles = "admin")]
+        [HttpGet("ByStatus/{status_id}")]
+        public async Task<ActionResult<List<OrderDTO>>> GetOrdersByStatus(int status_id)
         {
-            var orders = await _context.Orders.ToListAsync();
-
+            var orders = await _context.Orders.Where(o=>o.StatusId==status_id).Include(o=>o.Status).ToListAsync();
             //сортировка по дате заказа
-            var result = orders.OrderByDescending(o => o.CreateDate);
+            orders = orders.OrderByDescending(o => o.CreateDate).ToList();
+
+            var result=new List<OrderDTO>();
+            foreach (var order in orders)
+            {
+                result.Add(new OrderDTO()
+                {
+                    Id= order.Id,
+                    UserId= order.UserId,
+                    Adress=order.Adress,
+                    FullCost=order.FullCost,
+                    RecieveDate=order.RecieveDate,
+                    StatusId=order.StatusId,
+                    CreateDate=order.CreateDate,
+                    IsCmpleted=order.IsCmpleted,
+                    IsSelfPickUp=order.IsSelfPickUp,
+                    Status=order.Status.Title
+                });
+            }
+
             return Ok(result);
         }
 
+        //[HttpGet("ByUser/{user_id}")]
+        //public async Task<ActionResult<List<OrderDTO>>> GetUserOrders(int user_id)
+        //{
+        //    var orders = await _context.Orders.Where(o => o.UserId == user_id).Include(o => o.Status).ToListAsync();
+        //    //сортировка по дате заказа
+        //    orders = orders.OrderByDescending(o => o.CreateDate).ToList();
 
+        //    var result = new List<OrderDTO>();
+        //    foreach (var order in orders)
+        //    {
+        //        result.Add(new OrderDTO()
+        //        {
+        //            Id = order.Id,
+        //            UserId = order.UserId,
+        //            Adress = order.Adress,
+        //            FullCost = order.FullCost,
+        //            RecieveDate = order.RecieveDate,
+        //            StatusId = order.StatusId,
+        //            CreateDate = order.CreateDate,
+        //            IsCmpleted = order.IsCmpleted,
+        //            IsSelfPickUp = order.IsSelfPickUp,
+        //            Status = order.Status.Title
+        //        });
+        //    }
+
+        //    return Ok(result);
+        //}
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)

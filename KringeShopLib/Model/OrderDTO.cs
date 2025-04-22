@@ -18,6 +18,8 @@ namespace KringeShopLib.Model
 
         public int StatusId { get; set; }
 
+        public string? Status { get; set; } = null;
+
         public DateTime? CreateDate { get; set; }
 
         public bool IsCmpleted { get; set; }
