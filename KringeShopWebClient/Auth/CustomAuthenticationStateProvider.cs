@@ -1,16 +1,17 @@
-﻿using KringeShopWebClient.Model;
+﻿using Blazored.SessionStorage;
+using KringeShopWebClient.Model;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Security.Claims;
 
 namespace KringeShopWebClient.Auth
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly ProtectedSessionStorage _sessionStorage;
+        
+        private readonly ISessionStorageService _sessionStorage;
         private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public CustomAuthenticationStateProvider(ProtectedSessionStorage sessionStorage)
+        public CustomAuthenticationStateProvider(ISessionStorageService sessionStorage)
         {
             _sessionStorage = sessionStorage;
         }
@@ -18,8 +19,7 @@ namespace KringeShopWebClient.Auth
         {
             try
             {
-                var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
-                var userSession = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
+                var userSession = await _sessionStorage.GetItemAsync<UserSession>("UserSession");
                 if (userSession is null)
                     return await Task.FromResult(new AuthenticationState(_anonymous));
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
@@ -29,7 +29,7 @@ namespace KringeShopWebClient.Auth
                 }, "CustomAuth"));
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
             }
-            catch 
+            catch (Exception ex)
             {
                 return await Task.FromResult(new AuthenticationState(_anonymous));
             }
@@ -40,7 +40,7 @@ namespace KringeShopWebClient.Auth
             ClaimsPrincipal claimsPrincipal;
             if (userSession != null)
             {
-                await _sessionStorage.SetAsync("UserSession", userSession);
+                await _sessionStorage.SetItemAsync("UserSession", userSession);
                 claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
                    new Claim(ClaimTypes.Name, userSession.Username),
@@ -49,7 +49,7 @@ namespace KringeShopWebClient.Auth
             }
             else
             {
-                await _sessionStorage.DeleteAsync("UserSession");
+                await _sessionStorage.RemoveItemAsync("UserSession");
                 claimsPrincipal = _anonymous;
             }
 

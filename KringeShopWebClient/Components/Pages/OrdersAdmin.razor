@@ -4,6 +4,7 @@
 @using KringeShopWebClient.Services
 
 @inject AdminService adminService;
+@inject NavigationManager nav;
 
 <h3>Список заказов</h3>
 
@@ -41,6 +42,7 @@ else
                         <td>@order.IsSelfPickUp</td>
                         <td>@order.UserId</td>
                     <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
+                    <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
                     </tr>
             }
         </tbody>
@@ -48,6 +50,7 @@ else
 }
 
 @code {
+    private bool isEdit;
     private List<OrderDTO> orders;
 
     protected override Task OnInitializedAsync() => LoadData();
@@ -55,6 +58,11 @@ else
     private async Task LoadData()
     {
         orders = await adminService.GetOrdersList(1);
+    }
+
+    private void GoToOrderDetails(int order_id)
+    {
+        nav.NavigateTo($"OrderDetails/{order_id}");
     }
 
     private async void UpdateOrder(OrderDTO order)

@@ -2,6 +2,7 @@
 
 @rendermode InteractiveServer
 
+@using KringeShopWebClient.Components.Layout
 @using KringeShopWebClient.Services
 @using KringeShopLib.Model
 @using KringeShopWebClient.Extention
@@ -13,73 +14,87 @@
 @inject AuthService authService;
 @inject ConnectionService connectionService;
 
-<PageTitle>Home</PageTitle>
-
-<AuthorizeView Roles="user,admin">
-    <Authorized>
-        <h3>Hello @context.User.Identity.Name</h3>
-    </Authorized>
-
-    <NotAuthorized>
-        <h3>Hello guest</h3>
-    </NotAuthorized>
-</AuthorizeView>
-
-<h3>Список товаров</h3>
-
-<div>
-    <div>
-         <button @onclick="TestToast">Нажми</button> 
-        <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
-
-        <button @onclick="FilterProducts">
-            <i class="bi bi-search"></i>
-        </button>
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
     </div>
-</div>
 
-<div class="product-list">
-    @if (products is null||products.Count==0)
-    {
-        <h3>Ничего не нашлось</h3>
-    }
-    else
-    {
-        @foreach (var product in products)
-        {
-            <div class="product-item">
-                <div class="image-carousel">
-                    <button @onclick="() => PreviousImage(product)" class="image-btn">&#10094;</button>
-                    <div class="carousel-images">
-                        @foreach (var image in product.Images)
-                        {
-                            <img src="@($"data:image/png;base64,{image}")" style="display: @(image == product.CurrentImage ? "block" : "none")" />
-                        }
-                    </div>
-                    <button @onclick="() => NextImage(product)" class="image-btn">&#10095;</button>
+    <main>
+        <div class="top-row px-4">
+            @* <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a> *@
+        </div>
+
+        <article class="content px-4">
+            <PageTitle>Home</PageTitle>
+
+            <AuthorizeView Roles="user,admin">
+                <Authorized>
+                    <h3>Hello @context.User.Identity.Name</h3>
+                </Authorized>
+
+                <NotAuthorized>
+                    <h3>Hello guest</h3>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <h3>Список товаров</h3>
+
+            <div>
+                <div>
+                    <button @onclick="TestToast">Нажми</button>
+                    <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
+
+                    <button @onclick="FilterProducts">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </div>
-                <h4>@product.Name</h4>
-                <p>@product.Description</p>
-                <p>Цена: @product.Price.ToString("C") </p>
-                <button @onclick="()=>GoToDetails(product.Id)">...</button>
-                <AuthorizeView Roles="user">
-                    <Authorized>
-                        <div style="display:flex;">
-                            <button @onclick="() => BasketButtonClick(product)" class="@GetButtonClass(product)">
-                                <i class="bi bi-basket"></i>
-                            </button>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
             </div>
-        }
-    }
 
+            <div class="product-list">
+                @if (products is null || products.Count == 0)
+                {
+                    <h3>Ничего не нашлось</h3>
+                }
+                else
+                {
+                    @foreach (var product in products)
+                    {
+                        <div class="product-item">
+                            <div class="image-carousel">
+                                <button @onclick="() => PreviousImage(product)" class="image-btn">&#10094;</button>
+                                <div class="carousel-images">
+                                    @foreach (var image in product.Images)
+                                    {
+                                        <img src="@($"data:image/png;base64,{image}")" style="display: @(image == product.CurrentImage ? "block" : "none")" />
+                                    }
+                                </div>
+                                <button @onclick="() => NextImage(product)" class="image-btn">&#10095;</button>
+                            </div>
+                            <h4>@product.Name</h4>
+                            <p>@product.Description</p>
+                            <p>Цена: @product.Price.ToString("C") </p>
+                            <button @onclick="()=>GoToDetails(product.Id)">...</button>
+                            <AuthorizeView Roles="user">
+                                <Authorized>
+                                    <div style="display:flex;">
+                                        <button @onclick="() => BasketButtonClick(product)" class="@GetButtonClass(product)">
+                                            <i class="bi bi-basket"></i>
+                                        </button>
+                                    </div>
+                                </Authorized>
+                            </AuthorizeView>
+                        </div>
+                    }
+                }
+
+            </div>
+        </article>
+    </main>
 </div>
-
 @code {
     private string filter = string.Empty;
     private List<ProductDTO> products = new List<ProductDTO>();
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
@@ -87,7 +102,7 @@
 
     private void PreviousImage(ProductDTO product)
     {
-        if(product.Images!=null&&product.Images.Count>0)
+        if (product.Images != null && product.Images.Count > 0)
         {
             var currentIndex = product.Images.IndexOf(product.CurrentImage);
             if (currentIndex > 0)
@@ -113,7 +128,7 @@
 
     private async void TestToast()
     {
-        var authState=await authenticationState; 
+        var authState = await authenticationState;
         await jsruntime.InvokeVoidAsync("alert", $"Hello, {authState.User.Identity.Name}");
     }
 
@@ -133,7 +148,7 @@
         return basketProducts.Contains(product.Id) ? "btn btn-success" : "btn btn-outline-primary";
     }
 
-    private async void BasketButtonClick (ProductDTO product)
+    private async void BasketButtonClick(ProductDTO product)
     {
         if (!basketProducts.Contains(product.Id))
         {
@@ -173,7 +188,7 @@
 
     private async void FilterProducts()
     {
-        if(!string.IsNullOrEmpty(filter))
+        if (!string.IsNullOrEmpty(filter))
         {
             products = await connectionService.GetFilteredProductsList(filter);
             StateHasChanged();

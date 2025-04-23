@@ -44,7 +44,7 @@ namespace KringeShopApi.Controllers
                     RecieveDate=order.RecieveDate,
                     StatusId=order.StatusId,
                     CreateDate=order.CreateDate,
-                    IsCmpleted=order.IsCmpleted,
+                    //IsCmpleted=order.IsCmpleted,
                     IsSelfPickUp=order.IsSelfPickUp,
                     Status=order.Status.Title
                 });
@@ -72,7 +72,7 @@ namespace KringeShopApi.Controllers
         //            RecieveDate = order.RecieveDate,
         //            StatusId = order.StatusId,
         //            CreateDate = order.CreateDate,
-        //            IsCmpleted = order.IsCmpleted,
+        //            //IsCmpleted = order.IsCmpleted,
         //            IsSelfPickUp = order.IsSelfPickUp,
         //            Status = order.Status.Title
         //        });
@@ -82,7 +82,7 @@ namespace KringeShopApi.Controllers
         //}
         // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        public async Task<ActionResult<OrderDTO>> GetOrder(int id)
         {
             var order = await _context.Orders.FindAsync(id);
 
@@ -91,8 +91,21 @@ namespace KringeShopApi.Controllers
                 return NotFound();
             }
 
-            
-            return Ok(order);
+            order.Status = await _context.OrderStatuses.FindAsync(order.StatusId);
+
+            OrderDTO result = new OrderDTO()
+            {
+                Id=order.Id,
+                UserId=order.UserId,
+                Adress=order.Adress,
+                FullCost=order.FullCost,
+                RecieveDate=order.RecieveDate,
+                StatusId=order.StatusId,
+                Status=order.Status.Title,
+                CreateDate=order.CreateDate,
+                IsSelfPickUp=order.IsSelfPickUp
+            };
+            return Ok(result);
         }
 
         // PUT: api/Orders/5

@@ -2,8 +2,8 @@
 @using System.Security.Claims;
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using KringeShopWebClient.Model;
+@inject AuthenticationStateProvider authP;
 
-@inject ProtectedSessionStorage ProtectedSessionStorage
 <CascadingAuthenticationState>
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -32,19 +32,23 @@
                 <span aria-hidden="true"></span> Корзина
             </NavLink>
         </div>
+        
+       @*  <AuthorizeView Roles="admin">
+            <Authorized> *@
 
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/AddProduct">
+                            <span aria-hidden="true"></span> Добавить продукт
+                        </NavLink>
+                    </div>
 
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/AddProduct">
-                    <span aria-hidden="true"></span> Добавить продукт
-                </NavLink>
-            </div>
-
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/Orders">
-                    <span aria-hidden="true"></span> Заказы
-                </NavLink>
-            </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="/Orders">
+                            <span aria-hidden="true"></span> Заказы
+                        </NavLink>
+                    </div>
+            @* </Authorized>
+        </AuthorizeView> *@
         </nav>
 </div>
 </CascadingAuthenticationState>
@@ -55,23 +59,10 @@
     private ClaimsPrincipal authUser;
 
     protected override Task OnInitializedAsync() => LoadData();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        // string username;
-        // var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
-        // if (result.Success) username = result.Value.Username;
-        // else username = " ";
-        //return base.OnAfterRenderAsync(firstRender);
-    }
+   
     private async Task LoadData()
     {
-        // var auth = await authenticationState;
-        // authUser = auth.User;
-        // string username;
-        // var result = await ProtectedSessionStorage.GetAsync<UserSession>("UserSession");
-        // if (result.Success) username = result.Value.Username;
-        // else username = " ";
+        var authState = await authenticationState;
 
     }
 }

@@ -1,3 +1,4 @@
+using Blazored.SessionStorage;
 using KringeShopWebClient.Auth;
 using KringeShopWebClient.Components;
 using KringeShopWebClient.Services;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace KringeShopWebClient
 {
@@ -29,7 +31,16 @@ namespace KringeShopWebClient
             //builder.Services.AddAuthorization();
             builder.Services.AddCascadingAuthenticationState();
             //зависимости
-            builder.Services.AddScoped<ProtectedSessionStorage>();
+            builder.Services.AddBlazoredSessionStorage(config =>
+            {
+                config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.IgnoreNullValues = true;
+                config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+                config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+                config.JsonSerializerOptions.WriteIndented = false;
+            });
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             //синглтоны
             builder.Services.AddSingleton<ConnectionService>();

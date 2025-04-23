@@ -92,5 +92,26 @@ namespace KringeShopWebClient.Services
             }
         }
 
+        public async Task<OrderDTO> GetOrder(int order_id)
+        {
+            try
+            {
+                var responce = await client.GetAsync($"Orders/{order_id}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    //error
+                    return null;
+                }
+                else
+                {
+                    //success
+                    return await responce.Content.ReadFromJsonAsync<OrderDTO>();
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

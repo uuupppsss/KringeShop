@@ -1,5 +1,25 @@
 ﻿@page "/OrderDetails/{orderId:int}"
 
+@using KringeShopLib.Model;
+@using KringeShopWebClient.Services;
+
+@inject AdminService adminService;
+
+@if(order!=null)
+{
+    <div>
+        <label></label>
+    </div>    
+}
+
 @code {
     private int orderId;
+    private OrderDTO order;
+
+    protected override Task OnInitializedAsync() => LoadData();
+
+    private async Task LoadData()
+    {
+        order = await adminService.GetOrder(orderId);
+    }
 }
