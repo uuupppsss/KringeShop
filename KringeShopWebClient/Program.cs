@@ -4,7 +4,9 @@ using KringeShopWebClient.Components;
 using KringeShopWebClient.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
@@ -19,16 +21,19 @@ namespace KringeShopWebClient
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
-            builder.Services.AddAuthenticationCore();
-            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //    .AddCookie(options =>
-            //    {
-            //        options.Cookie.Name = "auth_token";
-            //        options.LoginPath = "/SignIn";
-            //        options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
-            //        options.AccessDeniedPath = "/SignIn";
-            //    });
-            //builder.Services.AddAuthorization();
+            //builder.Services.AddAuthenticationCore();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "auth_token";
+                    options.LoginPath = "/SignIn";
+                    options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
+                    options.AccessDeniedPath = "/SignIn";
+                    options.Cookie.SameSite = SameSiteMode.Lax;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.HttpOnly = true;
+                });
+            builder.Services.AddAuthorization();
             builder.Services.AddCascadingAuthenticationState();
             //зависимости
             builder.Services.AddBlazoredSessionStorage(config =>
@@ -41,7 +46,8 @@ namespace KringeShopWebClient
                 config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
                 config.JsonSerializerOptions.WriteIndented = false;
             });
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
             //синглтоны
             builder.Services.AddSingleton<ConnectionService>();
             builder.Services.AddSingleton<AuthService>();
@@ -60,12 +66,13 @@ namespace KringeShopWebClient
             }
 
             app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseStaticFiles();
             app.UseAntiforgery();
-            //app.UseAuthentication();
-            //app.UseAuthorization();
-
+           
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
