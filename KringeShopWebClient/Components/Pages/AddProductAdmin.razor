@@ -1,6 +1,6 @@
 ﻿@page "/AddProduct"
+@attribute [Authorize (Roles ="admin")]
 @rendermode InteractiveServer
-
 @using KringeShopWebClient.Model
 @using KringeShopLib.Model
 @using System.Net.Http.Headers
@@ -9,49 +9,49 @@
 
 @inject AdminService adminService
 @inject IJSRuntime js
+        <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-<h3>Добавить продукт</h3>
+            <div>
+                <label>Название:</label>
+                <InputText @bind-Value="product.Name" />
+            </div>
+            <div>
+                <label>Описание:</label>
+                <InputTextArea @bind-Value="product.Description" />
+            </div>
+            <div>
+                <label>Цена:</label>
+                <InputNumber @bind-Value="product.Price" />
+            </div>
+            <div>
+                <label>Количество:</label>
+                <InputNumber @bind-Value="product.Count" />
+            </div>
+            <div>
+                <label>Изображение:</label>
+                <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
 
-<EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+            </div>
+            <div>
+                <label>Категория:</label>
+                <select @bind="selectedTypeId">
+                    @if (!(types is null) && types.Count != 0)
+                    {
+                        foreach (var type in types)
+                        {
+                            <option value="@type.Id">@type.Title</option>
+                        }
+                    }
+                </select>
+            </div>
 
-    <div>
-        <label>Название:</label>
-        <InputText @bind-Value="product.Name" />
-    </div>
-    <div>
-        <label>Описание:</label>
-        <InputTextArea @bind-Value="product.Description" />
-    </div>
-    <div>
-        <label>Цена:</label>
-        <InputNumber @bind-Value="product.Price" />
-    </div>
-    <div>
-        <label>Количество:</label>
-        <InputNumber @bind-Value="product.Count" />
-    </div>
-    <div>
-        <label>Изображение:</label>
-        <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
+            <button type="submit">Сохранить</button>
+        </EditForm>
 
-    </div>
-    <div>
-        <label>Категория:</label>
-        <select @bind="selectedTypeId">
-            @if (!(types is null) && types.Count != 0)
-            {
-                foreach (var type in types)
-                {
-                    <option value="@type.Id">@type.Title</option>
-                }
-            }
-        </select>
-    </div>
 
-    <button type="submit">Сохранить</button>
-</EditForm>
+
 
 <style>
     .scaled-image {
@@ -60,6 +60,9 @@
     }
 </style>
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     private ProductDTO product=new ProductDTO();
     private List<byte[]> productPhotos;
     private int selectedTypeId;
@@ -77,6 +80,8 @@
     private async Task LoadData()
     {
         types = await adminService.GetTypesList();
+        var auth = await authenticationState;
+        var user = auth.User;
         StateHasChanged();
     }
 

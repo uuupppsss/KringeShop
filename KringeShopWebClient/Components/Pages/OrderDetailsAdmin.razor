@@ -1,16 +1,12 @@
 ﻿@page "/OrderDetails/{orderId:int}"
 
+@attribute [Authorize(Roles ="admin")]
 @using KringeShopLib.Model;
 @using KringeShopWebClient.Services;
 
 @inject AdminService adminService;
 
-@if(order!=null)
-{
-    <div>
-        <label></label>
-    </div>    
-}
+
 
 @code {
     private int orderId;

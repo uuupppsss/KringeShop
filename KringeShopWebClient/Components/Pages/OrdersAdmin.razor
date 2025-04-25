@@ -6,58 +6,65 @@
 @inject AdminService adminService;
 @inject NavigationManager nav;
 
-<h3>Список заказов</h3>
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <h3>Список заказов</h3>
 
-@if (orders == null || orders.Count == 0)
-{
-    <p>Нет доступных заказов.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Адрес</th>
-                <th>Полная стоимость</th>
-                <th>Дата получения</th>
-                <th>Статус</th>
-                <th>Дата создания</th>
-                <th>Завершен</th>
-                <th>Самовывоз</th>
-                <th>Пользователь ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in orders)
-            {
+        @if (orders == null || orders.Count == 0)
+        {
+            <p>Нет доступных заказов.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@order.Id</td>
-                        <td>@order.Adress</td>
-                        <td>@order.FullCost</td>
-                        <td>@order.RecieveDate?.ToString("g")</td>
-                        <td>@order.Status</td>
-                        <td>@order.CreateDate?.ToString("g")</td>
-                        <td>@order.IsCmpleted</td>
-                        <td>@order.IsSelfPickUp</td>
-                        <td>@order.UserId</td>
-                    <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
-                    <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
+                        <th>ID</th>
+                        <th>Адрес</th>
+                        <th>Полная стоимость</th>
+                        <th>Дата получения</th>
+                        <th>Статус</th>
+                        <th>Дата создания</th>
+                        <th>Завершен</th>
+                        <th>Самовывоз</th>
+                        <th>Пользователь ID</th>
                     </tr>
-            }
-        </tbody>
-    </table>
-}
+                </thead>
+                <tbody>
+                    @foreach (var order in orders)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@order.Adress</td>
+                            <td>@order.FullCost</td>
+                            <td>@order.RecieveDate?.ToString("g")</td>
+                            <td>@order.Status</td>
+                            <td>@order.CreateDate?.ToString("g")</td>
+                            <td>@order.IsCmpleted</td>
+                            <td>@order.IsSelfPickUp</td>
+                            <td>@order.UserId</td>
+                            <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
+                            <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private bool isEdit;
     private List<OrderDTO> orders;
-
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
     protected override Task OnInitializedAsync() => LoadData();
 
     private async Task LoadData()
     {
         orders = await adminService.GetOrdersList(1);
+        var auth = await authenticationState;
+        var user = auth.User;
     }
 
     private void GoToOrderDetails(int order_id)
