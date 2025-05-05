@@ -67,7 +67,7 @@ namespace KringeShopApi.Controllers
         audience: AuthOptions.AUDIENCE,
         //кладём полезную нагрузку
         claims: claims,
-        //устанавливаем время жизни токена 2 минуты
+        //устанавливаем время жизни токена 30
         expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(30)),
         signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 

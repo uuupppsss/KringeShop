@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
 using KringeShopApi.HomeModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KringeShopApi.Controllers
 {
@@ -22,10 +23,12 @@ namespace KringeShopApi.Controllers
             _context = context;
         }
 
+        [Authorize (Roles ="user")]
         // GET: api/BasketItems/GetUsersBasketItems/1
         [HttpGet("GetUsersBasketItems/{username}")]
         public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(string username)
         {
+            var us = HttpContext.User.Claims.FirstOrDefault();
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user is null) return NotFound();
             int user_id = user.Id;
