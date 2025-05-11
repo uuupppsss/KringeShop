@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Components.Server;
+using System.Net.Http.Headers;
 
 namespace KringeShopWebClient.Services
 {
@@ -21,6 +22,7 @@ namespace KringeShopWebClient.Services
         public static void SetToken(string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
         }
     }
 }

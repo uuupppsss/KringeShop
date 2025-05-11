@@ -5,9 +5,6 @@ using KringeShopWebClient.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.JSInterop;
 using System.Text.Json;
 
 namespace KringeShopWebClient
@@ -33,7 +30,10 @@ namespace KringeShopWebClient
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     options.Cookie.HttpOnly = true;
                 });
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+            });
             builder.Services.AddCascadingAuthenticationState();
             //зависимости
             builder.Services.AddBlazoredSessionStorage(config =>

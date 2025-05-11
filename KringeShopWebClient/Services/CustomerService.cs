@@ -124,9 +124,12 @@ namespace KringeShopWebClient.Services
         {
             List<BasketItemDTO> basket = await GetUserBasket(username);
             HashSet<int> result = new HashSet<int>();
-            foreach (var product in basket)
+            if (basket != null)
             {
-                result.Add(product.ProductId);
+                foreach (var product in basket)
+                {
+                    result.Add(product.ProductId);
+                }
             }
             return result;
         }

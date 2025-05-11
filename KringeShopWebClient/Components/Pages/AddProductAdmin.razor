@@ -1,5 +1,5 @@
 ﻿@page "/AddProduct"
-@attribute [Authorize (Roles ="admin")]
+
 @rendermode InteractiveServer
 @using KringeShopWebClient.Model
 @using KringeShopLib.Model
@@ -9,46 +9,54 @@
 
 @inject AdminService adminService
 @inject IJSRuntime js
-        <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+@* <AuthorizeView Roles="admin">
+    <Authorized> *@
+@if(isAdmin)
+{
+    <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-            <div>
-                <label>Название:</label>
-                <InputText @bind-Value="product.Name" />
-            </div>
-            <div>
-                <label>Описание:</label>
-                <InputTextArea @bind-Value="product.Description" />
-            </div>
-            <div>
-                <label>Цена:</label>
-                <InputNumber @bind-Value="product.Price" />
-            </div>
-            <div>
-                <label>Количество:</label>
-                <InputNumber @bind-Value="product.Count" />
-            </div>
-            <div>
-                <label>Изображение:</label>
-                <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
+        <div>
+            <label>Название:</label>
+            <InputText @bind-Value="product.Name" />
+        </div>
+        <div>
+            <label>Описание:</label>
+            <InputTextArea @bind-Value="product.Description" />
+        </div>
+        <div>
+            <label>Цена:</label>
+            <InputNumber @bind-Value="product.Price" />
+        </div>
+        <div>
+            <label>Количество:</label>
+            <InputNumber @bind-Value="product.Count" />
+        </div>
+        <div>
+            <label>Изображение:</label>
+            <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
 
-            </div>
-            <div>
-                <label>Категория:</label>
-                <select @bind="selectedTypeId">
-                    @if (!(types is null) && types.Count != 0)
+        </div>
+        <div>
+            <label>Категория:</label>
+            <select @bind="selectedTypeId">
+                @if (!(types is null) && types.Count != 0)
+                {
+                    foreach (var type in types)
                     {
-                        foreach (var type in types)
-                        {
-                            <option value="@type.Id">@type.Title</option>
-                        }
+                        <option value="@type.Id">@type.Title</option>
                     }
-                </select>
-            </div>
+                }
+            </select>
+        </div>
 
-            <button type="submit">Сохранить</button>
-        </EditForm>
+        <button type="submit">Сохранить</button>
+    </EditForm>
+}
+@*  </Authorized>
+</AuthorizeView> *@
+      
 
 
 
@@ -68,11 +76,13 @@
     private int selectedTypeId;
     private List<ProductTypeDTO> types;
 
+    private bool isAdmin;
+
     protected override async Task OnInitializedAsync() => LoadData();
 
     private async Task HandleValidSubmit()
     {
-        //отладка!!!
+        
         product.TypeId = selectedTypeId;
         await adminService.AddProduct(product, productPhotos);
     }
@@ -82,6 +92,7 @@
         types = await adminService.GetTypesList();
         var auth = await authenticationState;
         var user = auth.User;
+        isAdmin = user.Identity.IsAuthenticated && user.IsInRole("admin");
         StateHasChanged();
     }
 

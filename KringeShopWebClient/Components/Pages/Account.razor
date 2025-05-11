@@ -6,6 +6,7 @@
 @using KringeShopWebClient.Components.Layout
 @using KringeShopWebClient.Extention
 @using KringeShopWebClient.Auth
+@using Microsoft.AspNetCore.Components.Server
 
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager nav;
@@ -108,8 +109,11 @@
 
     private async void SignOut()
     {
-        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(null);
+        // var customAuthStateProvider = authStateProvider as CustomAuthenticationStateProvider;
+        // await customAuthStateProvider.UpdateAuthenticationState(null);
+
+        var customAuthStateProvider = authStateProvider as ServerAuthenticationStateProvider;
+        customAuthStateProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(new System.Security.Claims.ClaimsPrincipal())));
         nav.NavigateTo("/", true);
     }
 
