@@ -19,10 +19,10 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public static void SetToken(string token)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        }
+        //public static void SetToken(string token)
+        //{
+        //    _httpClient.DefaultRequestHeaders.Authorization =
+        //    new AuthenticationHeaderValue("Bearer", token);
+        //}
     }
 }

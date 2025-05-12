@@ -7,11 +7,13 @@
 @using KringeShopWebClient.Extention
 
 
+
 @inject IJSRuntime jsruntime;
 @inject NavigationManager nav;
 @inject CustomerService customerService;
 @inject AuthService authService;
 @inject ConnectionService connectionService;
+
 
 @* <div class="page">
     <div class="sidebar">
@@ -98,6 +100,21 @@
     private Task<AuthenticationState> authenticationState { get; set; }
 
     private HashSet<int> basketProducts = new HashSet<int>();
+    private int loadedItemsCount = 0;
+    private bool isLoading = false;
+
+    private int productsCount = 0;
+
+    protected override Task OnInitializedAsync() => LoadData();
+    private async Task LoadData()
+    {
+        await LoadMoreProducts();
+        productsCount = await connectionService.GetProductsTotalCount();
+        var authState = await authenticationState;
+        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
+            basketProducts = await customerService.GetProductsInBasket(authState.User.Identity.Name);
+
+    }
 
     private void PreviousImage(ProductDTO product)
     {
@@ -141,7 +158,6 @@
         await jsruntime.ToastrError(message);
     }
 
-    protected override Task OnInitializedAsync() => LoadData();
     private string GetButtonClass(ProductDTO product)
     {
         return basketProducts.Contains(product.Id) ? "btn btn-success" : "btn btn-outline-primary";
@@ -176,27 +192,37 @@
         }
     }
 
-    private async Task LoadData()
-    {
-        products = await connectionService.GetProductsList();
-        var authState = await authenticationState;
-        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-            basketProducts = await customerService.GetProductsInBasket(authState.User.Identity.Name);
-
-    }
-
     private async void FilterProducts()
     {
-        if (!string.IsNullOrEmpty(filter))
-        {
-            products = await connectionService.GetFilteredProductsList(filter);
-            StateHasChanged();
-        }
+        // if (!string.IsNullOrEmpty(filter))
+        // {
+        //     products = await connectionService.GetFilteredProductsList(filter);
+        //     StateHasChanged();
+        // }
     }
 
     private void GoToDetails(int product_id)
     {
         nav.NavigateTo($"product/{product_id}");
     }
+
+    private async Task LoadMoreProducts()
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        var newProducts = await connectionService.GetProductsList(loadedItemsCount);
+        products.AddRange(newProducts);
+        loadedItemsCount += newProducts.Count;
+        isLoading = false;
+        StateHasChanged(); // Обновляем состояние компонента
+    }
+
+    private void OnScroll()
+    {
+        
+    }
+
+    
 
 }

@@ -25,12 +25,13 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<List<ProductDTO>>> GetProducts()
+        [HttpGet("All/{loadedItemsCount}")]
+        public async Task<ActionResult<List<ProductDTO>>> GetProducts(int loadedItemsCount)
         {
             List<ProductDTO> result = new List<ProductDTO>();
             List<Product> products = new();
-           products = await _context.Products.Include(p=>p.ProductImages).ToListAsync();
+           products = await _context.Products.Include(p=>p.ProductImages)
+                .Skip(loadedItemsCount).Take(9).ToListAsync();
             foreach (var product in products)
             {
                 result.Add(new ProductDTO()
@@ -54,6 +55,13 @@ namespace KringeShopApi.Controllers
                 }
             }
             return Ok(result);
+        }
+
+        //Products/TotalCount
+        [HttpGet("Products/TotalCount")]
+        public async Task<ActionResult<int>> GetProductsTotalCount()
+        {
+            return Ok(_context.Products.Count());
         }
 
         // GET: api/Products/Filter/filterword

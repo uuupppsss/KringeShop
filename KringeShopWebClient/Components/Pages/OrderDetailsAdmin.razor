@@ -1,21 +1,84 @@
-﻿@page "/OrderDetails/{orderId:int}"
+﻿@page "/OrderDetails/{OrderId:int}"
+@rendermode InteractiveServer
 
-@attribute [Authorize(Roles ="admin")]
 @using KringeShopLib.Model;
 @using KringeShopWebClient.Services;
 
 @inject AdminService adminService;
+@inject NavigationManager nav;
 
+<AuthorizeView Roles="admin"> 
+    <Authorized>
+        @if (order != null)
+        {
+            <div>
+                <h5>Заказ #@order.Id</h5>
+                <p><strong>Адрес:</strong> @order.Adress</p>
+                <p><strong>Полная стоимость:</strong> @order.FullCost.ToString("C")</p>
+                <p><strong>Дата получения:</strong> @order.RecieveDate?.ToString("d")</p>
+                <p><strong>Статус:</strong> @order.Status</p>
+                <p><strong>Дата создания:</strong> @order.CreateDate?.ToString("d")</p>
+                <p><strong>Самовывоз:</strong> @(order.IsSelfPickUp ? "Да" : "Нет")</p>
 
+                <h5>Товары в заказе:</h5>
+                <ul>
+                    @if (orderItems != null)
+                    {
+                        foreach (var item in orderItems)
+                        {
+                            <li>
+                                <div>
+                                    <label>Товар#@item.ProductId @item.ProductName - @item.Count шт. - @item.Cost.ToString("C")</label>
+                                    <button @onclick="()=>GoToProductDetails(item.ProductId)"><i>...</i></button>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <h5>Контактные данные:</h5>
+                @if (user != null)
+                {
+                    <label><strong>Имя пользователя</strong></label>
+                    <p>@user.Username</p>
+
+                    <label><strong>Почта</strong></label>
+                    <p>@user.Email</p>
+
+                    <label><strong>Телефон</strong></label>
+                    <p>@user.ContactPhone</p>
+                }
+
+                @* <button @onclick="UpdateOrder"><i class="bi bi-pencil"></i></button> *@
+
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
 
 @code {
-    private int orderId;
+    [Parameter]
+    public int OrderId{ get; set; }
     private OrderDTO order;
+    private UserDTO user;
+    private List<OrderItemDTO> orderItems;
 
     protected override Task OnInitializedAsync() => LoadData();
 
     private async Task LoadData()
     {
-        order = await adminService.GetOrder(orderId);
+        order = await adminService.GetOrder(OrderId);
+        orderItems = await adminService.GetOrderItems(OrderId);
+        user = await adminService.GetUserData(order.UserId);
+    }
+
+    private void GoToProductDetails(int product_id)
+    {
+        nav.NavigateTo($"/Product/{product_id}");
+    }
+
+    private async void UpdateOrder()
+    {
+        
     }
 }

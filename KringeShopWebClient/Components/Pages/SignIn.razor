@@ -60,21 +60,14 @@
         var claims = new List<Claim>
         {
         new  Claim(ClaimTypes.Name, response.Username),
-        new  Claim(ClaimTypes.Role, response.Role)
-
+        new  Claim(ClaimTypes.Role, response.Role),
+        new Claim("Token", response.Token)
         };
         var ident = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var prinsipal = new ClaimsPrincipal(ident);
 
         var customAuthStateProvider = authStateProvider as ServerAuthenticationStateProvider;
         customAuthStateProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(prinsipal)));
-
-        // await customAuthStateProvider.UpdateAuthenticationState(new UserSession
-        //     { 
-                
-        //         Username = response.Username,
-        //         Role = response.Role
-        //     });
 
         nav.NavigateTo("/");
     }

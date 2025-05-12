@@ -71,6 +71,28 @@ namespace KringeShopApi.Controllers
             return Ok(result);
         }
 
+        [HttpGet("ById/{user_id}")]
+        public async Task<ActionResult<UserDTO>> GetUserData(int user_id)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id==user_id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            UserDTO result = new UserDTO()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Password = user.Password,
+                ContactPhone = user.ContactPhone,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                //Role=user.Role.Title
+            };
+            return Ok(result);
+        }
+
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]

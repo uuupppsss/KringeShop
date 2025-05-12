@@ -10,7 +10,23 @@
 <AuthorizeView Roles="admin">
     <Authorized>
         <h3>Список заказов</h3>
+        <div>
+            <input type="text"  placeholder="Фильтр по пользователю..." />
 
+            <select >
+                @if (!(statuses is null) && statuses.Count != 0)
+                {
+                    foreach (var status in statuses)
+                    {
+                        <option value="@status.Id">@status.Title</option>
+                    }
+                }
+            </select>
+
+            <button>
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
         @if (orders == null || orders.Count == 0)
         {
             <p>Нет доступных заказов.</p>
@@ -26,40 +42,66 @@
                         <th>Дата получения</th>
                         <th>Статус</th>
                         <th>Дата создания</th>
-                        <th>Завершен</th>
                         <th>Самовывоз</th>
-                        <th>Пользователь ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var order in orders)
                     {
-                        <tr>
-                            <td>@order.Id</td>
-                            <td>@order.Adress</td>
-                            <td>@order.FullCost</td>
-                            <td>@order.RecieveDate?.ToString("g")</td>
-                            <td>@order.Status</td>
-                            <td>@order.CreateDate?.ToString("g")</td>
-                            <td>@order.IsCmpleted</td>
-                            <td>@order.IsSelfPickUp</td>
-                            <td>@order.UserId</td>
-                            <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
-                            <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
-                        </tr>
-                    }
+                        if (editOrder!=null&&editOrder.Id == order.Id)
+                       {
+                            <tr >
+                                <td>@order.Id</td>
+                                <td>@order.Adress</td>
+                                <td>@order.FullCost</td>
+                                <td><input type="date" @bind-value="@order.RecieveDate" class="form-control" /></td>
+                                <td>
+                                    <select @bind="@order.StatusId">
+                                        @if (!(statuses is null) && statuses.Count != 0)
+                                        {
+                                            foreach (var status in statuses)
+                                            {
+                                                <option value="@status.Id">@status.Title</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>@order.CreateDate?.ToString("g")</td>
+                                <td>@order.IsSelfPickUp</td>
+                                <td><button @onclick="()=>CancelEdit()"><i class="bi bi-x"></i></button></td>
+                                <td><button @onclick="()=>SaveOrder()"><i class="bi bi-check"></i></button></td>
+                            </tr>
+                    
+                       }
+                        else
+                        {
+                            <tr >
+                                <td>@order.Id</td>
+                                <td>@order.Adress</td>
+                                <td>@order.FullCost</td>
+                                <td>@order.RecieveDate?.ToString("g")</td>
+                                <td>@order.Status</td>
+                                <td>@order.CreateDate?.ToString("g")</td>
+                                <td>@order.IsSelfPickUp</td>
+                                <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
+                                <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
+                            </tr>
+                        }
+            }
                 </tbody>
             </table>
         }
      </Authorized>
      <NotAuthorized>
-         <p>Эта страница только для админа! </p>
+         <NotAuthorizedLayout/>
      </NotAuthorized>
 </AuthorizeView>
  
 @code {
     //private bool isEdit;
     private List<OrderDTO> orders;
+    private OrderDTO editOrder;
+    private List<OrderStatusDTO> statuses;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -67,18 +109,39 @@
 
     private async Task LoadData()
     {
+        var authState = await authenticationState;
+        var user = authState.User;
         orders = await adminService.GetOrdersList(1);
-        var auth = await authenticationState;
-        var user = auth.User;
+        if(user!=null)
+            statuses = await adminService.GetOrderStatuses(user.FindFirst("Token")?.Value);
+
     }
+
 
     private void GoToOrderDetails(int order_id)
     {
         nav.NavigateTo($"OrderDetails/{order_id}");
     }
 
-    private async void UpdateOrder(OrderDTO order)
+    private void UpdateOrder(OrderDTO order)
     {
-        
+        editOrder = order;
+        StateHasChanged();
+
+    }
+
+    private async Task SaveOrder()
+    {
+        await adminService.UpdateOrder(editOrder);
+        await LoadData();
+
+        editOrder = null;
+        StateHasChanged();
+    }
+
+    private void CancelEdit()
+    {
+        editOrder = null;
+        StateHasChanged();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using KringeShopLib.Model;
+using System.Net.Http.Headers;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -111,6 +113,78 @@ namespace KringeShopWebClient.Services
             catch
             {
                 return null;
+            }
+        }
+
+        public async Task<List<OrderStatusDTO>> GetOrderStatuses(string token)
+        {
+            if (token != null)
+            {
+                //var request = new HttpRequestMessage(HttpMethod.Get, "OrderStatus");
+                //request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                //var response = await client.SendAsync(request);
+                //return await response.Content.ReadFromJsonAsync<List<OrderStatusDTO>>();
+                using (var client=new HttpClient())
+                {
+                    try
+                    {
+                        client.BaseAddress = new Uri("http://localhost:5216/api/");
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        return await client.GetFromJsonAsync<List<OrderStatusDTO>>("OrderStatus");
+                    }
+                    catch
+                    {
+                        //ошибка
+                    }
+                }
+            }
+            return null;
+        }
+        public async Task<List<OrderItemDTO>> GetOrderItems(int order_id)
+        {
+            try
+            {
+
+                return await client.GetFromJsonAsync<List<OrderItemDTO>>($"OrderItems/{order_id}");
+            }
+            catch
+            {
+                //ошибка
+                return null;
+            }
+
+
+        }
+
+        public async Task<UserDTO> GetUserData(int user_id)
+        {
+            try
+            {
+                var responce = await client.GetAsync($"Users/ById/{user_id}");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                else
+                {
+                    return await responce.Content.ReadFromJsonAsync<UserDTO>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task UpdateOrder(OrderDTO order)
+        {
+            try
+            {
+
+            }
+            catch
+            {
+
             }
         }
     }

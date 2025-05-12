@@ -53,9 +53,9 @@ namespace KringeShopWebClient.Services
                 }
                 else
                 {
-                    serverResponce = await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>();
-                    Client.SetToken(serverResponce.Token);
-                    return serverResponce;
+                    return await responce.Content.ReadFromJsonAsync<ResponseTokenAndStuff>();
+                    //Client.SetToken(serverResponce.Token);
+                    
                 }
             }
             catch (Exception ex)

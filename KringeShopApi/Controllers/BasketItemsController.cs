@@ -23,7 +23,7 @@ namespace KringeShopApi.Controllers
             _context = context;
         }
 
-        [Authorize (Roles ="user")]
+        //[Authorize (Roles ="user")]
         // GET: api/BasketItems/GetUsersBasketItems/1
         [HttpGet("GetUsersBasketItems/{username}")]
         public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(string username)

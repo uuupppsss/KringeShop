@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using KringeShopApi.Model;
 using KringeShopLib.Model;
 using KringeShopApi.HomeModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KringeShopApi.Controllers
 {
@@ -23,10 +24,20 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/OrderStatus
+        //[Authorize (Roles="admin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderStatus>>> GetOrderStatuses()
+        public async Task<ActionResult<List<OrderStatusDTO>>> GetOrderStatuses()
         {
-            return await _context.OrderStatuses.ToListAsync();
+            List<OrderStatusDTO> result = new();
+            foreach (var s in _context.OrderStatuses)
+            {
+                result.Add(new OrderStatusDTO()
+                {
+                    Id= s.Id,
+                    Title= s.Title
+                });
+            }
+            return Ok(result);
         }
 
         // GET: api/OrderStatus/5

@@ -1,5 +1,5 @@
 ﻿@page "/AddProduct"
-
+@* @attribute [Authorize (Roles ="admin")] *@
 @rendermode InteractiveServer
 @using KringeShopWebClient.Model
 @using KringeShopLib.Model
@@ -34,7 +34,7 @@
             <InputNumber @bind-Value="product.Count" />
         </div>
         <div>
-            <label>Изображение:</label>
+            <label>Изображения: (выберите до 5 картинок)</label>
             <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
 
         </div>
@@ -57,10 +57,6 @@
 @*  </Authorized>
 </AuthorizeView> *@
       
-
-
-
-
 <style>
     .scaled-image {
         transform: scale(0.2); 
