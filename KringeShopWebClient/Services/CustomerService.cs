@@ -2,128 +2,126 @@
 using KringeShopWebClient.Model;
 using System.Text.Json;
 using System.Text;
-using static System.Net.WebRequestMethods;
 using System.Net.Http.Headers;
 
 namespace KringeShopWebClient.Services
 {
     public class CustomerService
     {
+        //для клиента
         private readonly HttpClient client;
         public CustomerService()
         {
             client = Client.HttpClient;
         }
 
-        public async Task<List<BasketItemDTO>> GetUserBasket(string username)
+        //***
+        public async Task<List<BasketItemDTO>> GetUserBasket(string token)
         {
-            try
+            if (token != null)
             {
-                var responce = await client.GetAsync($"BasketItems/GetUsersBasketItems/{username}");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    return null;
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"BasketItems/GetUsersBasketItems");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<List<BasketItemDTO>>();
+
                 }
-                else
+                catch (Exception ex)
                 {
-                    return await responce.Content.ReadFromJsonAsync<List<BasketItemDTO>>();
+                    Console.WriteLine(ex.Message);
+
                 }
             }
-            catch
+            return null;
+        }
+
+        //***
+        public async Task AddProductToBasket(string token, BasketItemDTO basketItem)
+        {
+            if(token!=null)
             {
-                return null;
+                try
+                {
+                    string json = JsonSerializer.Serialize(basketItem);
+                    var request = new HttpRequestMessage(HttpMethod.Post, $"BasketItems");
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
-        public async Task AddProductToBasket(string username, BasketItemDTO basketItem)
+        //***
+        public async Task RemoveBasketItem(string token, int id)
         {
-            try
+            if (token != null)
             {
-                string json = JsonSerializer.Serialize(basketItem);
-                var responce = await client.PostAsync($"BasketItems/{username}", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
+                    var request = new HttpRequestMessage(HttpMethod.Delete, $"BasketItems/{id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
 
                 }
-                else
+                catch (Exception ex)
                 {
-                    //успех
-                };
-            }
-            catch 
-            {
-
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
-        public async Task RemoveBasketItem(int id)
+        //***
+        public async Task UpdateBasketItem(string token,BasketItemDTO basketItem)
         {
-            try
+            if (token != null)
             {
-                var responce = await client.DeleteAsync($"BasketItems/{id}");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    //ошибка
+                    string json = JsonSerializer.Serialize(basketItem);
+                    var request = new HttpRequestMessage(HttpMethod.Put, $"BasketItems");
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+
                 }
-                else
+                catch (Exception ex)
                 {
-                    //успех
-                };
-            }
-            catch
-            {
-                //ошибка
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
-        public async Task UpdateBasketItem(BasketItemDTO basketItem)
+        //***
+        public async Task<int> GetBasketItemMaxCount(string token, int basketItem_id)
         {
-            try
+            if (token != null)
             {
-                string json = JsonSerializer.Serialize(basketItem);
-                var responce = await client.PutAsync($"BasketItems", new StringContent(json, Encoding.UTF8, "application/json"));
-
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"BasketItems/GetMaxCount/{basketItem_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<int>();
                 }
-                else
+                catch (Exception ex)
                 {
-
-                    //успех
+                    Console.WriteLine(ex.Message);
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
+            return 0;
         }
 
-        public async Task<int> GetBasketItemMaxCount(int basketItem_id)
+        
+        public async Task<HashSet<int>> GetProductsInBasket(string token)
         {
-            try
-            {
-                var responce = await client.GetAsync($"BasketItems/GetMaxCount/{basketItem_id}");
-
-                if (!responce.IsSuccessStatusCode)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return await responce.Content.ReadFromJsonAsync<int>();
-                    //успех
-                }
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
-
-        public async Task<HashSet<int>> GetProductsInBasket(string username)
-        {
-            List<BasketItemDTO> basket = await GetUserBasket(username);
+            List<BasketItemDTO> basket = await GetUserBasket(token);
             HashSet<int> result = new HashSet<int>();
             if (basket != null)
             {
@@ -135,37 +133,17 @@ namespace KringeShopWebClient.Services
             return result;
         }
 
-        public async Task<ProductDTO> GetProductDetails(int product_id)
-        {
-            try
-            {
-                var responce = await client.GetAsync($"Products/{product_id}");
-                if (!responce.IsSuccessStatusCode)
-                {
-                    return null;
-                }
-                else
-                {
-                    return await responce.Content.ReadFromJsonAsync<ProductDTO>();
-                    //успех
-                }
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
+        //***
         public async Task CreateOrder(string token,OrderDTO order)
         {
             if (token != null)
             {
-                string json = JsonSerializer.Serialize(order);
-                var request = new HttpRequestMessage(HttpMethod.Post, "Orders/Create");
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 try
                 {
+                    string json = JsonSerializer.Serialize(order);
+                    var request = new HttpRequestMessage(HttpMethod.Post, "Orders/Create");
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                     await client.SendAsync(request);
                 }
                 catch

@@ -62,8 +62,8 @@
     private async Task LoadData()
     {
         var authState = await authenticationState;
-        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-            basketItems=await customerService.GetUserBasket(authState.User.Identity.Name);
+        if (!string.IsNullOrEmpty(authState.User.FindFirst("Token")?.Value))
+            basketItems = await customerService.GetUserBasket(authState.User.FindFirst("Token")?.Value);
     }
 
     private void SignUp()
@@ -78,14 +78,16 @@
 
     private async void DeleteBasketItem(int id)
     {
-        await customerService.RemoveBasketItem(id);
+        var authState = await authenticationState;
+        await customerService.RemoveBasketItem(authState.User.FindFirst("Token")?.Value,id);
         await LoadData();
         StateHasChanged();
     }
 
     private async Task IncrementItemCount(BasketItemDTO basketItem)
     {
-        int maxCount = await customerService.GetBasketItemMaxCount(basketItem.Id);
+        var authState = await authenticationState;
+        int maxCount = await customerService.GetBasketItemMaxCount(authState.User.FindFirst("Token")?.Value,basketItem.Id);
         if(basketItem.Count<maxCount)
         {
             decimal price = basketItem.Cost / basketItem.Count;
@@ -110,7 +112,8 @@
 
     private async Task UpdateBasket(BasketItemDTO basketItem)
     {
-        await customerService.UpdateBasketItem(basketItem);
+        var authState = await authenticationState;
+        await customerService.UpdateBasketItem(authState.User.FindFirst("Token")?.Value,basketItem);
     }
 
     private void GoToDetails(int product_id)

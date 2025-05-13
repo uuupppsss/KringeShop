@@ -23,15 +23,15 @@ namespace KringeShopApi.Controllers
             _context = context;
         }
 
-        //[Authorize (Roles ="user")]
-        // GET: api/BasketItems/GetUsersBasketItems/1
-        [HttpGet("GetUsersBasketItems/{username}")]
-        public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems(string username)
+        [Authorize(Roles = "user")]
+        // GET: api/BasketItems/GetUsersBasketItems
+        [HttpGet("GetUsersBasketItems")]
+        public async Task<ActionResult<List<BasketItemDTO>>> GetUsersBasketItems()
         {
             var us = HttpContext.User.Claims.FirstOrDefault();
-            User user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            int.TryParse(us.Value, out int user_id);
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id==user_id);
             if (user is null) return NotFound();
-            int user_id = user.Id;
             List<BasketItem> basketItems= await _context.BasketItems.Where(b=>b.UserId==user_id).Include(b=>b.Product).ToListAsync();
             List<BasketItemDTO> result = new();
             if (basketItems.Count != 0)
@@ -53,19 +53,20 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/BasketItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<BasketItem>> GetBasketItem(int id)
-        {
-            var basketItem = await _context.BasketItems.FindAsync(id);
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<BasketItem>> GetBasketItem(int id)
+        //{
+        //    var basketItem = await _context.BasketItems.FindAsync(id);
 
-            if (basketItem == null)
-            {
-                return NotFound();
-            }
+        //    if (basketItem == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return basketItem;
-        }
+        //    return basketItem;
+        //}
 
+        [Authorize (Roles = "user")]
         // PUT: api/BasketItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
@@ -108,13 +109,15 @@ namespace KringeShopApi.Controllers
 
         // POST: api/BasketItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("{username}")]
-        public async Task<ActionResult> PostBasketItem(string username, BasketItemDTO sent_basketItem)
+        [HttpPost]
+        public async Task<ActionResult> PostBasketItem( BasketItemDTO sent_basketItem)
         {
+            var us=HttpContext.User.Claims.FirstOrDefault();
+            int.TryParse(us.Value, out int user_id);
             if (sent_basketItem == null) return BadRequest(); 
             Product product= await _context.Products.FirstOrDefaultAsync(p=>p.Id== sent_basketItem.ProductId);
             if (product == null) return NotFound();
-            User user= await _context.Users.FirstOrDefaultAsync(u=>u.Username==username);
+            User user= await _context.Users.FirstOrDefaultAsync(u=>u.Id==user_id);
             if (user == null) return NotFound();
             BasketItem basketItem = new BasketItem()
             {
@@ -134,6 +137,7 @@ namespace KringeShopApi.Controllers
             
         }
 
+        [Authorize (Roles ="user")]
         // DELETE: api/BasketItems/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBasketItem(int id)
@@ -155,6 +159,7 @@ namespace KringeShopApi.Controllers
             return _context.BasketItems.Any(e => e.Id == id);
         }
 
+        [Authorize (Roles ="user")]
         [HttpGet("GetMaxCount/{id}")]
         public async Task<ActionResult<int>> GetBasketItemMaxCount(int id)
         {

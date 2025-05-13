@@ -8,6 +8,7 @@ namespace KringeShopWebClient.Services
 {
     public class AdminService
     {
+        //для админа
         private readonly HttpClient client;
         public AdminService()
         {
@@ -129,6 +130,7 @@ namespace KringeShopWebClient.Services
             }
             return null;
         }
+        
         public async Task<List<OrderItemDTO>> GetOrderItems(int order_id)
         {
             try

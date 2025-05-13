@@ -15,8 +15,30 @@
                 <h5>Заказ #@order.Id</h5>
                 <p><strong>Адрес:</strong> @order.Adress</p>
                 <p><strong>Полная стоимость:</strong> @order.FullCost.ToString("C")</p>
-                <p><strong>Дата получения:</strong> @order.RecieveDate?.ToString("d")</p>
-                <p><strong>Статус:</strong> @order.Status</p>
+                @if(isEditing)
+                {
+                    <p><strong>Дата получения:</strong>
+                        <input type="date" @bind-value="updatedRecieveDate" />
+                    </p>
+
+                    <p>
+                        <strong>Статус:</strong>
+                        <select @bind="updatedStatusId">
+                            @if (!(statuses is null) && statuses.Count != 0)
+                            {
+                                foreach (var status in statuses)
+                                {
+                                    <option value="@status.Id">@status.Title</option>
+                                }
+                            }
+                        </select>
+                    </p>
+                }
+                else
+                {
+                    <p><strong>Дата получения:</strong> @order.RecieveDate?.ToString("d")</p>
+                    <p><strong>Статус:</strong> @order.Status</p>
+                }
                 <p><strong>Дата создания:</strong> @order.CreateDate?.ToString("d")</p>
                 <p><strong>Самовывоз:</strong> @(order.IsSelfPickUp ? "Да" : "Нет")</p>
 
@@ -49,6 +71,25 @@
                     <p>@user.ContactPhone</p>
                 }
 
+                @if(order.StatusId!=4&&order.StatusId!=5)
+                {
+                    @if(isEditing)
+                    {
+                        <button @onclick="SaveChanges">
+                            <i class="bi bi-check"></i>
+                        </button>
+                        <button @onclick="ExitEditing">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button @onclick="UpdateOrder">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    }
+
+            }
             </div>
         }
     </Authorized>
@@ -60,6 +101,11 @@
     private OrderDTO order;
     private UserDTO user;
     private List<OrderItemDTO> orderItems;
+    private bool isEditing = false;
+    private List<OrderStatusDTO> statuses;
+
+    private int updatedStatusId;
+    private DateTime? updatedRecieveDate;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -69,11 +115,14 @@
     private async Task LoadData()
     {
         var auth = await authenticationState;
+        statuses = await adminService.GetOrderStatuses(auth.User.FindFirst("Token")?.Value);
         order = await adminService.GetOrder(OrderId, auth.User.FindFirst("Token")?.Value);
         if(order!=null)
         {
             orderItems = await adminService.GetOrderItems(OrderId);
             user = await adminService.GetUserData(order.UserId);
+            updatedStatusId = order.StatusId;
+            updatedRecieveDate = order.RecieveDate;
         }
     }
 
@@ -82,8 +131,26 @@
         nav.NavigateTo($"/Product/{product_id}");
     }
 
-    private async void UpdateOrder()
+    private void UpdateOrder()
     {
-        
+        isEditing = true;
+        StateHasChanged();
+    }
+
+    private async void SaveChanges()
+    {
+        var auth = await authenticationState;
+        order.RecieveDate = updatedRecieveDate;
+        order.StatusId = updatedStatusId;
+        await adminService.UpdateOrder(auth.User.FindFirst("Token")?.Value,order);
+        order = await adminService.GetOrder(OrderId, auth.User.FindFirst("Token")?.Value);
+        isEditing = false;
+        StateHasChanged();
+    }
+
+    private void ExitEditing()
+    {
+        isEditing = false;
+        StateHasChanged();
     }
 }

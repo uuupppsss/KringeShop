@@ -1,27 +1,33 @@
-﻿@page "/Product/{productId:int}"
+﻿@page "/Product/{ProductId:int}/{IsInBasket:bool}"
 @rendermode InteractiveServer
 
 @using KringeShopLib.Model
 @using KringeShopWebClient.Services
 
+@inject ConnectionService connectionService;
 @inject CustomerService customerService;
 
 @if(Product!=null)
 {
     <div class="center-container">
         <div class="product-card">
-            <div class="image-carousel">
-                <button @onclick="() => PreviousImage(Product)" class="image-btn">&#10094;</button>
-                <div class="carousel-images">
-                    @foreach (var image in Product.Images)
-                    {
-                        <img src="@($"data:image/png;base64,{image}")" style="display: @(image == Product.CurrentImage ? "block" : "none")" />
-                    }
+            
+                <div class="image-carousel">
+                    <button @onclick="() => PreviousImage(Product)" class="image-btn">&#10094;</button>
+               
+                        <div class="carousel-images">
+                            @foreach (var image in Product.Images)
+                            {
+                                <img src="@($"data:image/png;base64,{image}")" style="display: @(image == Product.CurrentImage ? "block" : "none")" />
+                            }
+                        </div>
+                    <button @onclick="() => NextImage(Product)" class="image-btn">&#10095;</button>
                 </div>
-                <button @onclick="() => NextImage(Product)" class="image-btn">&#10095;</button>
-            </div>
+            
+            
             <h2 class="product-title">@Product.Name</h2>
             <p class="product-description">@Product.Description</p>
+            <p class="product-description">@Product.Type</p>
             <span class="product-price">@Product.Price ₽</span>
             <p>Осталось @Product.Count шт.</p>
 
@@ -30,9 +36,15 @@
                     {
                     <AuthorizeView Roles="user">
                         <Authorized>
-                            <button class="buy-button">
+                            <div>
+                            <button @onclick="AddProductToBasket" disabled="@IsInBasket" class="buy-button">
                                 <i class="bi bi-basket"></i>
                             </button>
+                            @if(IsInBasket)
+                            {
+                                <i>Товар в корзине</i>
+                            }
+                                                    </div>
                         </Authorized>
                     </AuthorizeView>
                     }
@@ -68,14 +80,19 @@ else
 @code {
     [Parameter]
     public int ProductId { get; set; }
+    [Parameter]
+    public bool IsInBasket { get; set; }
 
     private ProductDTO Product;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
     protected override Task OnInitializedAsync() => LoadData();
 
     private async Task LoadData()
     {
-        Product = await customerService.GetProductDetails(ProductId);
+        Product = await connectionService.GetProductDetails(ProductId);
     }
 
     private void PreviousImage(ProductDTO product)
@@ -102,5 +119,26 @@ else
             }
             //else product.CurrentImage = product.Images[currentIndex - 1];
         }
+    }
+
+    private async void AddProductToBasket()
+    {
+        var authState = await authenticationState;
+        BasketItemDTO basketitem = new BasketItemDTO()
+            {
+                ProductId = ProductId,
+                Count = 1,
+                Cost = Product.Price
+            };
+
+        if (!string.IsNullOrEmpty(authState.User.FindFirst("Token")?.Value))
+        {
+            await customerService.AddProductToBasket(authState.User.FindFirst("Token")?.Value, basketitem);
+
+            StateHasChanged();
+        }
+
+        IsInBasket = true;
+        StateHasChanged();
     }
 }

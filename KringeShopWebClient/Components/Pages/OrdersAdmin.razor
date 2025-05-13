@@ -22,14 +22,11 @@
                 }
             </select>
 
-            <input type="number" placeholder="Поиск по номеру..." />
-            @if(searchedOrderId==0)
-            {
-                <button @onclick="SearchOrder">
-                    <i class="bi bi-search"></i>
-                </button>
-            }
-            else
+            <input type="number" @bind-value="searchedOrderId" placeholder="Поиск по номеру..." />
+            <button @onclick="SearchOrder">
+                <i class="bi bi-search"></i>
+            </button>
+            @if(searchedOrderId>0)
             {
                 <button @onclick="ExitSearchOrder">
                     <i class="bi bi-x"></i>
@@ -57,52 +54,22 @@
                 <tbody>
                     @foreach (var order in orders)
                     {
-                        if (editOrder!=null&&editOrder.Id == order.Id)
-                       {
-                            <tr >
+
+                        if (order != null)
+                        {
+                            <tr>
                                 <td>@order.Id</td>
                                 <td>@order.Adress</td>
                                 <td>@order.FullCost</td>
-                                <td><input type="date" @bind-value="@order.RecieveDate" class="form-control" /></td>
-                                <td>
-                                    <select @bind="@order.StatusId">
-                                        @if (!(statuses is null) && statuses.Count != 0)
-                                        {
-                                            foreach (var status in statuses)
-                                            {
-                                                <option value="@status.Id">@status.Title</option>
-                                            }
-                                        }
-                                    </select>
-                                </td>
+                                <td>@order.RecieveDate?.ToString("g")</td>
+                                <td>@order.Status</td>
                                 <td>@order.CreateDate?.ToString("g")</td>
                                 <td>@order.IsSelfPickUp</td>
-                                <td><button @onclick="()=>CancelEdit()"><i class="bi bi-x"></i></button></td>
-                                <td><button @onclick="()=>SaveOrder()"><i class="bi bi-check"></i></button></td>
+                                <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
                             </tr>
+                        }
 
-                        }
-                        else
-                        {
-                            if(order!=null)
-                            {
-                                <tr>
-                                    <td>@order.Id</td>
-                                    <td>@order.Adress</td>
-                                    <td>@order.FullCost</td>
-                                    <td>@order.RecieveDate?.ToString("g")</td>
-                                    <td>@order.Status</td>
-                                    <td>@order.CreateDate?.ToString("g")</td>
-                                    <td>@order.IsSelfPickUp</td>
-                                    @if (order.StatusId != 4 && order.StatusId != 5)
-                                    {
-                                        <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
-                                    }
-                                    <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
-                                </tr>
-                            }
-                        }
-            }
+                    }
                 </tbody>
             </table>
         }
@@ -115,10 +82,11 @@
 @code {
     //private bool isEdit;
     private List<OrderDTO> orders;
-    private OrderDTO editOrder;
+    // private OrderDTO editOrder;
     private List<OrderStatusDTO> statuses;
     private int selectedStatusId;
     private int searchedOrderId;
+    private bool search=false;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -150,32 +118,32 @@
         nav.NavigateTo($"OrderDetails/{order_id}");
     }
 
-    private void UpdateOrder(OrderDTO order)
-    {
-        editOrder = order;
-        StateHasChanged();
+    // private void UpdateOrder(OrderDTO order)
+    // {
+    //     editOrder = order;
+    //     StateHasChanged();
 
-    }
+    // }
 
-    private async Task SaveOrder()
-    {
-        var authState = await authenticationState;
-        var user = authState.User;
-        if(user!=null)
-        {
-            await adminService.UpdateOrder(user.FindFirst("Token")?.Value, editOrder);
-            await LoadData();
-        }
+    // private async Task SaveOrder()
+    // {
+    //     var authState = await authenticationState;
+    //     var user = authState.User;
+    //     if(user!=null)
+    //     {
+    //         await adminService.UpdateOrder(user.FindFirst("Token")?.Value, editOrder);
+    //         await LoadData();
+    //     }
 
-        editOrder = null;
-        StateHasChanged();
-    }
+    //     editOrder = null;
+    //     StateHasChanged();
+    // }
 
-    private void CancelEdit()
-    {
-        editOrder = null;
-        StateHasChanged();
-    }
+    // private void CancelEdit()
+    // {
+    //     editOrder = null;
+    //     StateHasChanged();
+    // }
 
     private async void StatusChanged(ChangeEventArgs e)
     {
@@ -194,14 +162,18 @@
             OrderDTO searchedOder = await adminService.
             GetOrder(searchedOrderId,user.FindFirst("Token")?.Value);
             orders.Add(searchedOder);
+            search = true;
+            selectedStatusId = 0;
             StateHasChanged();
         }
+
     }
 
     private async void ExitSearchOrder()
     {
         searchedOrderId = 0;
         await LoadData();
+        search = false;
         StateHasChanged();
     }
 }

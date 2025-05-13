@@ -13,6 +13,7 @@
 @inject CustomerService customerService;
 @inject AuthService authService;
 @inject ConnectionService connectionService;
+@inject AdminService adminService;
 
 
 @* <div class="page">
@@ -42,13 +43,26 @@
 
             <div>
                 <div>
-                    <button @onclick="TestToast">Нажми</button>
-                    <input type="text" @bind="filter" placeholder="Фильтр по названию..." />
-
+                    <input type="text" @bind-value="filter" placeholder="Поиск..." />
+        <select @onchange="FilterTypeChanged">
+                        @if (!(types is null) && types.Count != 0)
+                        {
+                            foreach (var type in types)
+                            {
+                                <option value="@type.Id">@type.Title</option>
+                            }
+                        }
+                    </select>
                     <button @onclick="FilterProducts">
                         <i class="bi bi-search"></i>
                     </button>
-                </div>
+                    @if (filter != null)
+                    {
+                        <button @onclick="SkipFilter">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    }
+    </div>
             </div>
 
             <div class="product-list" @onwheel="OnScroll">
@@ -103,42 +117,33 @@
     </main>
 </div> *@
 @code {
-    // ElementReference scrollElement;
-    // DotNetObjectReference selfReference;
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         selfReference = DotNetObjectReference.Create(this);
-    //         var minInterval = 500; // Only notify every 500 ms
-    //         await jsruntime.InvokeVoidAsync("onDivScroll",
-    //             scrollElement, minInterval);
-    //     }
-    // }
-
-    // public void Dispose() => selfReference?.Dispose();
-
-    private string filter = string.Empty;
-    private List<ProductDTO> products;
-
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    private HashSet<int> basketProducts = new HashSet<int>();
-    private int loadedItemsCount = 0;
-    private bool isLoading = false;
+    private List<ProductDTO> products;
 
+    private string filter;
+
+    private List<ProductTypeDTO> types;
+    private int selectedFilterTypeId;
+
+    private HashSet<int> basketProducts = new HashSet<int>();
+    private bool isLoading;
+    private int loadedItemsCount = 0;
     private int productsCount = 0;
 
     protected override Task OnInitializedAsync() => LoadData();
     private async Task LoadData()
     {
         if (products is null) products = new();
+        loadedItemsCount = 0;
+        types = await adminService.GetTypesList();
+        types.Insert(0, new ProductTypeDTO {Id=0,Title="Все" });
         await LoadMoreProducts();
-        productsCount = await connectionService.GetProductsTotalCount();
+        productsCount = await connectionService.GetProductsCount();
         var authState = await authenticationState;
         if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-            basketProducts = await customerService.GetProductsInBasket(authState.User.Identity.Name);
+            basketProducts = await customerService.GetProductsInBasket(authState.User.FindFirst("Token")?.Value);
 
     }
 
@@ -168,22 +173,6 @@
         }
     }
 
-    private async void TestToast()
-    {
-        var authState = await authenticationState;
-        await jsruntime.InvokeVoidAsync("alert", $"Hello, {authState.User.Identity.Name}");
-    }
-
-    private async void ShowSuccessMessage(string message)
-    {
-        await jsruntime.ToastrSuccess(message);
-    }
-
-    private async void ShowErrorMessage(string message)
-    {
-        await jsruntime.ToastrError(message);
-    }
-
     private string GetButtonClass(ProductDTO product)
     {
         return basketProducts.Contains(product.Id) ? "btn btn-success" : "btn btn-outline-primary";
@@ -210,26 +199,36 @@
                 Cost = product.Price * count,
             };
 
-        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
+        if (!string.IsNullOrEmpty(authState.User.FindFirst("Token")?.Value))
         {
-            await customerService.AddProductToBasket(authState.User.Identity.Name, basketitem);
-            basketProducts = await customerService.GetProductsInBasket(authState.User.Identity.Name);
+            await customerService.AddProductToBasket(authState.User.FindFirst("Token")?.Value, basketitem);
+            basketProducts = await customerService.GetProductsInBasket(authState.User.FindFirst("Token")?.Value);
             StateHasChanged();
         }
     }
 
     private async void FilterProducts()
     {
-        // if (!string.IsNullOrEmpty(filter))
-        // {
-        //     products = await connectionService.GetFilteredProductsList(filter);
-        //     StateHasChanged();
-        // }
+        if (isLoading) return;
+        isLoading = true;
+
+        productsCount = await connectionService.GetProductsCount(filter,selectedFilterTypeId);
+        products = new();
+
+        loadedItemsCount = 0;
+        var newProducts = await connectionService.
+        GetProductsList(loadedItemsCount, filter, selectedFilterTypeId);
+
+        products.AddRange(newProducts);
+        loadedItemsCount += newProducts.Count;
+        isLoading = false;
+        StateHasChanged();
     }
 
     private void GoToDetails(int product_id)
     {
-        nav.NavigateTo($"product/{product_id}");
+        bool isInBasket = basketProducts.Contains(product_id);
+        nav.NavigateTo($"product/{product_id}/{isInBasket}");
     }
 
     private async Task LoadMoreProducts()
@@ -237,7 +236,7 @@
         if (isLoading) return;
 
         isLoading = true;
-        var newProducts = await connectionService.GetProductsList(loadedItemsCount);
+        var newProducts = await connectionService.GetProductsList(loadedItemsCount,filter,selectedFilterTypeId);
         products.AddRange(newProducts);
         loadedItemsCount += newProducts.Count;
         isLoading = false;
@@ -250,6 +249,19 @@
 
     }
 
-    
+    private async void FilterTypeChanged(ChangeEventArgs e)
+    {
+        selectedFilterTypeId = Convert.ToInt32(e.Value);
+        FilterProducts();
+
+    }
+
+    private async void SkipFilter()
+    {
+        filter = null;
+        selectedFilterTypeId = 0;
+        await LoadData();
+        StateHasChanged();
+    }
 
 }

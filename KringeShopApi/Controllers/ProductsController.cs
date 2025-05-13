@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.Authorization;
-using System.Reflection.Metadata;
 using KringeShopApi.HomeModel;
 
 namespace KringeShopApi.Controllers
@@ -25,13 +18,23 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Products
-        [HttpGet("All/{loadedItemsCount}")]
-        public async Task<ActionResult<List<ProductDTO>>> GetProducts(int loadedItemsCount)
+        [HttpGet("All/{loadedItemsCount}/{filterword}/{type_id}")]
+        public async Task<ActionResult<List<ProductDTO>>> GetProducts(int loadedItemsCount,string filterword,int type_id)
         {
+            filterword = filterword.ToLower();
             List<ProductDTO> result = new List<ProductDTO>();
             List<Product> products = new();
-           products = await _context.Products.Include(p=>p.ProductImages)
-                .Skip(loadedItemsCount).Take(9).ToListAsync();
+            List<Product> full_products_list = await _context.Products
+                .Include(p => p.ProductImages).ToListAsync();
+            if(filterword!="-")
+                full_products_list=full_products_list.
+                    Where(p => p.Name.ToLower().Contains(filterword)||
+                (p.Description!=null&&p.Description.ToLower().Contains(filterword))).ToList();
+            if (type_id != 0)
+                full_products_list = full_products_list.
+                    Where(p => p.TypeId == type_id).ToList();
+            products = full_products_list
+                 .Skip(loadedItemsCount).Take(18).ToList();
             foreach (var product in products)
             {
                 result.Add(new ProductDTO()
@@ -57,35 +60,46 @@ namespace KringeShopApi.Controllers
             return Ok(result);
         }
 
-        //Products/TotalCount
-        [HttpGet("Products/TotalCount")]
-        public async Task<ActionResult<int>> GetProductsTotalCount()
+        [HttpGet("Count/{filterword}/{type_id}")]
+        public async Task<ActionResult<int>> GetProductsCount(string filterword, int type_id)
         {
-            return Ok(_context.Products.Count());
+            List<Product> result = await _context.Products.ToListAsync();
+            if (filterword != "-") 
+                result = result.Where(r => r.Name.Contains(filterword) 
+                ||(r.Description!=null&&r.Description.Contains(filterword)) ).ToList();
+            if(type_id!=0)
+                result=result.Where(r=>r.TypeId==type_id).ToList();
+            return Ok(result.Count);
         }
 
+        //[HttpGet("TotalCount")]
+        //public async Task<ActionResult<int>> GetProductsTotalCount()
+        //{
+        //    return Ok(_context.Products.Count());
+        //}
+
         // GET: api/Products/Filter/filterword
-        [HttpGet("Filter/{filterword}")]
-        public async Task<ActionResult<List<ProductDTO>>> GetFilteredProducts(string filterword)
-        {
-            List<ProductDTO> result = new List<ProductDTO>();
-            List<Product> products = new();
-            products = await _context.Products.Where(p=>p.Name.Contains(filterword)||p.Description.Contains(filterword)).ToListAsync();
-            foreach (var product in products)
-            {
-                result.Add(new ProductDTO()
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    TypeId = product.TypeId,
-                    Price = product.Price,
-                    Count = product.Count,
-                    TimeBought = product.TimeBought
-                });
-            }
-            return Ok(result);
-        }
+        //[HttpGet("Filter/{filterword}")]
+        //public async Task<ActionResult<List<ProductDTO>>> GetFilteredProducts(string filterword)
+        //{
+        //    List<ProductDTO> result = new List<ProductDTO>();
+        //    List<Product> products = new();
+        //    products = await _context.Products.Where(p=>p.Name.Contains(filterword)||p.Description.Contains(filterword)).ToListAsync();
+        //    foreach (var product in products)
+        //    {
+        //        result.Add(new ProductDTO()
+        //        {
+        //            Id = product.Id,
+        //            Name = product.Name,
+        //            Description = product.Description,
+        //            TypeId = product.TypeId,
+        //            Price = product.Price,
+        //            Count = product.Count,
+        //            TimeBought = product.TimeBought
+        //        });
+        //    }
+        //    return Ok(result);
+        //}
 
         // GET: api/Products/5
         [HttpGet("{id}")]
@@ -212,20 +226,20 @@ namespace KringeShopApi.Controllers
         }
 
         //[Authorize(Roles = "admin")]
-        [HttpPost("Upload")]
-        public async Task<ActionResult> UploadProductImage(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
+        //[HttpPost("Upload")]
+        //public async Task<ActionResult> UploadProductImage(IFormFile file)
+        //{
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("No file uploaded.");
 
-            var filePath = Path.Combine("uploads", file.FileName);
+        //    var filePath = Path.Combine("uploads", file.FileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+        //    using (var stream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        await file.CopyToAsync(stream);
+        //    }
 
-            return Ok(new { FilePath = filePath });
-        }
+        //    return Ok(new { FilePath = filePath });
+        //}
     }
 }
