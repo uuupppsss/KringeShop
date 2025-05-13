@@ -49,8 +49,6 @@
                     <p>@user.ContactPhone</p>
                 }
 
-                @* <button @onclick="UpdateOrder"><i class="bi bi-pencil"></i></button> *@
-
             </div>
         }
     </Authorized>
@@ -63,13 +61,20 @@
     private UserDTO user;
     private List<OrderItemDTO> orderItems;
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     protected override Task OnInitializedAsync() => LoadData();
 
     private async Task LoadData()
     {
-        order = await adminService.GetOrder(OrderId);
-        orderItems = await adminService.GetOrderItems(OrderId);
-        user = await adminService.GetUserData(order.UserId);
+        var auth = await authenticationState;
+        order = await adminService.GetOrder(OrderId, auth.User.FindFirst("Token")?.Value);
+        if(order!=null)
+        {
+            orderItems = await adminService.GetOrderItems(OrderId);
+            user = await adminService.GetUserData(order.UserId);
+        }
     }
 
     private void GoToProductDetails(int product_id)

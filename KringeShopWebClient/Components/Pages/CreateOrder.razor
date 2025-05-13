@@ -48,7 +48,7 @@
 
         var authState = await authenticationState;
         if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-        await customerService.CreateOrder(authState.User.Identity.Name, order);
+            await customerService.CreateOrder(authState.User.FindFirst("Token")?.Value, order);
 
     }
 }

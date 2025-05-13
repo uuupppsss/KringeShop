@@ -3,6 +3,7 @@ using KringeShopWebClient.Model;
 using System.Text.Json;
 using System.Text;
 using static System.Net.WebRequestMethods;
+using System.Net.Http.Headers;
 
 namespace KringeShopWebClient.Services
 {
@@ -155,25 +156,25 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task CreateOrder(string username,OrderDTO order)
+        public async Task CreateOrder(string token,OrderDTO order)
         {
-            try
+            if (token != null)
             {
-                string json=JsonSerializer.Serialize(order);
-                var responce = await client.PostAsync($"Orders/Create/{username}", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
+                string json = JsonSerializer.Serialize(order);
+                var request = new HttpRequestMessage(HttpMethod.Post, "Orders/Create");
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                try
                 {
-                    //ошибка
+                    await client.SendAsync(request);
                 }
-                else
+                catch
                 {
-                    //успех
+                    
                 }
+
             }
-            catch
-            {
-                //ошибка
-            }
+
         }
 
         

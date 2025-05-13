@@ -25,13 +25,22 @@
             <span class="product-price">@Product.Price ₽</span>
             <p>Осталось @Product.Count шт.</p>
 
-            <AuthorizeView Roles="user">
-                <Authorized>
-                    <button class="buy-button">
-                        <i class="bi bi-basket"></i>
-                    </button>
-                </Authorized>
-            </AuthorizeView>
+           
+                    @if(Product.Count>0)
+                    {
+                    <AuthorizeView Roles="user">
+                        <Authorized>
+                            <button class="buy-button">
+                                <i class="bi bi-basket"></i>
+                            </button>
+                        </Authorized>
+                    </AuthorizeView>
+                    }
+                    else
+                    {
+                        <i>Нет в наличии</i>
+                    }
+               
             <AuthorizeView Roles="admin">
                 <Authorized>
                     <div style="display:flex;">

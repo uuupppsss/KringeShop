@@ -75,15 +75,25 @@
                             <p>@product.Description</p>
                             <p>Цена: @product.Price.ToString("C") </p>
                             <button @onclick="()=>GoToDetails(product.Id)">...</button>
-                            <AuthorizeView Roles="user">
-                                <Authorized>
-                                    <div style="display:flex;">
-                                        <button @onclick="() => BasketButtonClick(product)" class="@GetButtonClass(product)">
-                                            <i class="bi bi-basket"></i>
-                                        </button>
-                                    </div>
-                                </Authorized>
-                            </AuthorizeView>
+                            @if (product.Count > 0)
+                            {
+                                <AuthorizeView Roles="user">
+                                    <Authorized>
+                                        <div style="display:flex;">
+                                            <button @onclick="() => BasketButtonClick(product)" class="@GetButtonClass(product)">
+                                                <i class="bi bi-basket"></i>
+                                            </button>
+                                        </div>
+                                    </Authorized>
+                                </AuthorizeView>
+                            }
+                            else
+                            {
+                                <i>Нет в наличии</i>
+                            }
+                                   
+
+                               
                         </div>
                     }
                 }

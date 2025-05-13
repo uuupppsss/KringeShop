@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using KringeShopApi.Model;
 using KringeShopLib.Model;
 using Microsoft.AspNetCore.Authorization;
 using KringeShopApi.HomeModel;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static NuGet.Packaging.PackagingConstants;
+using System.Collections.Generic;
 
 namespace KringeShopApi.Controllers
 {
@@ -24,11 +21,19 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Orders
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpGet("ByStatus/{status_id}")]
         public async Task<ActionResult<List<OrderDTO>>> GetOrdersByStatus(int status_id)
         {
-            var orders = await _context.Orders.Where(o=>o.StatusId==status_id).Include(o=>o.Status).ToListAsync();
+            List<Order> orders = new();
+            if (status_id == 0)
+            {
+                orders = await _context.Orders.Include(o => o.Status).ToListAsync();
+            }
+            else
+            {
+                orders = await _context.Orders.Where(o => o.StatusId == status_id).Include(o => o.Status).ToListAsync();
+            }
             //сортировка по дате заказа
             orders = orders.OrderByDescending(o => o.CreateDate).ToList();
 
@@ -80,7 +85,9 @@ namespace KringeShopApi.Controllers
 
         //    return Ok(result);
         //}
+
         // GET: api/Orders/5
+        [Authorize (Roles ="user,admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDTO>> GetOrder(int id)
         {
@@ -111,15 +118,14 @@ namespace KringeShopApi.Controllers
         // PUT: api/Orders/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "admin")]
-        [HttpPut("{id}")]
-        public async Task<ActionResult> PutOrder(int id, Order order)
+        [HttpPut]
+        public async Task<ActionResult> PutOrder(OrderDTO sent_order)
         {
-            if (id != order.Id)
-            {
-                return BadRequest();
-            }
+            Order found_order=await _context.Orders.FirstOrDefaultAsync(o=>o.Id==sent_order.Id);
+            if (found_order == null) return BadRequest();
 
-            _context.Entry(order).State = EntityState.Modified;
+            found_order.StatusId=sent_order.StatusId;
+            found_order.RecieveDate=sent_order.RecieveDate;
 
             try
             {
@@ -128,27 +134,23 @@ namespace KringeShopApi.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if (!OrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    return BadRequest(ex.Message);
-                }
+                return BadRequest(ex.Message);
             }
            
         }
 
         // POST: api/Orders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("Create/{username}")]
-        public async Task<ActionResult> PostOrder(string username, OrderDTO sent_order)
+        [Authorize (Roles = "user")]
+        [HttpPost("Create")]
+        public async Task<ActionResult> PostOrder( OrderDTO sent_order)
         {
-            User user = await _context.Users.FirstOrDefaultAsync(u=>u.Username==username);
+            int.TryParse(HttpContext.User.Claims.FirstOrDefault().Value, out int user_id);
+            User user = await _context.Users.FirstOrDefaultAsync(u=>u.Id==user_id);
             if (user == null) return NotFound();
 
-            OrderStatus status = await _context.OrderStatuses.FirstOrDefaultAsync(o => o.Id == sent_order.StatusId);
+            OrderStatus status = await _context.OrderStatuses
+                .FirstOrDefaultAsync(o => o.Id == sent_order.StatusId);
             if (status == null) return NotFound();
 
             //добавление заказа
@@ -169,10 +171,12 @@ namespace KringeShopApi.Controllers
             await _context.SaveChangesAsync();
 
             //добавление товаров в заказ
-            var userBasket=await _context.BasketItems.Where(b=>b.UserId==user.Id).ToListAsync();
+            var userBasket=await _context.BasketItems.Where(b=>b.UserId==user.Id).
+                Include(i=>i.Product).ToListAsync();
 
             foreach(var item in userBasket)
             {
+                item.Product.Count-=item.Count;
                 _context.OrderItems.Add(new OrderItem()
                 {
                     ProductId=item.ProductId,
@@ -180,7 +184,7 @@ namespace KringeShopApi.Controllers
                     Cost=item.Cost,
                     OrdeId=order.Id
                 });
-                _context.BasketItems.Remove(item);
+                _context.BasketItems.Remove(item); 
             }
             await _context.SaveChangesAsync();
 

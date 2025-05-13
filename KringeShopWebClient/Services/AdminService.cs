@@ -71,72 +71,61 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task<List<OrderDTO>> GetOrdersList(int status_id)
+        public async Task<List<OrderDTO>> GetOrdersList(string token,int status_id)
         {
-            try
+            if (token != null)
             {
-                var responce = await client.GetAsync($"Orders/ByStatus/{status_id}");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    //error
-                    return null;
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"Orders/ByStatus/{status_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<List<OrderDTO>>();
                 }
-                else
+                catch (Exception ex)
                 {
-                    //success
-                    return await responce.Content.ReadFromJsonAsync<List<OrderDTO>>();
+                    Console.WriteLine(ex.Message);
                 }
             }
-            catch
-            {
-                //error
-                return null;
-            }
+            return null;
         }
 
-        public async Task<OrderDTO> GetOrder(int order_id)
+        public async Task<OrderDTO> GetOrder(int order_id, string token)
         {
-            try
+           
+            if (token != null)
             {
-                var responce = await client.GetAsync($"Orders/{order_id}");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    //error
-                    return null;
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"Orders/{order_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<OrderDTO>();
                 }
-                else
+                catch(Exception ex)
                 {
-                    //success
-                    return await responce.Content.ReadFromJsonAsync<OrderDTO>();
+                    Console.WriteLine(ex.Message);
                 }
             }
-            catch
-            {
-                return null;
-            }
+            return null;
         }
 
         public async Task<List<OrderStatusDTO>> GetOrderStatuses(string token)
         {
             if (token != null)
             {
-                //var request = new HttpRequestMessage(HttpMethod.Get, "OrderStatus");
-                //request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                //var response = await client.SendAsync(request);
-                //return await response.Content.ReadFromJsonAsync<List<OrderStatusDTO>>();
-                using (var client=new HttpClient())
+                try
                 {
-                    try
-                    {
-                        client.BaseAddress = new Uri("http://localhost:5216/api/");
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                        return await client.GetFromJsonAsync<List<OrderStatusDTO>>("OrderStatus");
-                    }
-                    catch
-                    {
-                        //ошибка
-                    }
+                    var request = new HttpRequestMessage(HttpMethod.Get, "OrderStatus");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<List<OrderStatusDTO>>();
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
             }
             return null;
         }
@@ -176,14 +165,22 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        public async Task UpdateOrder(OrderDTO order)
+        public async Task UpdateOrder(string token, OrderDTO order)
         {
-            try
+            if (token != null)
             {
+                string json = JsonSerializer.Serialize(order);
+                var request = new HttpRequestMessage(HttpMethod.Put, "Orders/");
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                try
+                {
+                    await client.SendAsync(request);
+                }
+                catch
+                {
 
-            }
-            catch
-            {
+                }
 
             }
         }

@@ -11,9 +11,8 @@
     <Authorized>
         <h3>Список заказов</h3>
         <div>
-            <input type="text"  placeholder="Фильтр по пользователю..." />
 
-            <select >
+            <select @onchange="StatusChanged">
                 @if (!(statuses is null) && statuses.Count != 0)
                 {
                     foreach (var status in statuses)
@@ -23,9 +22,19 @@
                 }
             </select>
 
-            <button>
-                <i class="bi bi-search"></i>
-            </button>
+            <input type="number" placeholder="Поиск по номеру..." />
+            @if(searchedOrderId==0)
+            {
+                <button @onclick="SearchOrder">
+                    <i class="bi bi-search"></i>
+                </button>
+            }
+            else
+            {
+                <button @onclick="ExitSearchOrder">
+                    <i class="bi bi-x"></i>
+                </button>
+            }
         </div>
         @if (orders == null || orders.Count == 0)
         {
@@ -71,21 +80,27 @@
                                 <td><button @onclick="()=>CancelEdit()"><i class="bi bi-x"></i></button></td>
                                 <td><button @onclick="()=>SaveOrder()"><i class="bi bi-check"></i></button></td>
                             </tr>
-                    
-                       }
+
+                        }
                         else
                         {
-                            <tr >
-                                <td>@order.Id</td>
-                                <td>@order.Adress</td>
-                                <td>@order.FullCost</td>
-                                <td>@order.RecieveDate?.ToString("g")</td>
-                                <td>@order.Status</td>
-                                <td>@order.CreateDate?.ToString("g")</td>
-                                <td>@order.IsSelfPickUp</td>
-                                <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
-                                <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
-                            </tr>
+                            if(order!=null)
+                            {
+                                <tr>
+                                    <td>@order.Id</td>
+                                    <td>@order.Adress</td>
+                                    <td>@order.FullCost</td>
+                                    <td>@order.RecieveDate?.ToString("g")</td>
+                                    <td>@order.Status</td>
+                                    <td>@order.CreateDate?.ToString("g")</td>
+                                    <td>@order.IsSelfPickUp</td>
+                                    @if (order.StatusId != 4 && order.StatusId != 5)
+                                    {
+                                        <td><button @onclick="()=>UpdateOrder(order)"><i class="bi bi-pencil"></i></button></td>
+                                    }
+                                    <td><button @onclick="()=>GoToOrderDetails(order.Id)"><i>...</i></button></td>
+                                </tr>
+                            }
                         }
             }
                 </tbody>
@@ -102,6 +117,8 @@
     private List<OrderDTO> orders;
     private OrderDTO editOrder;
     private List<OrderStatusDTO> statuses;
+    private int selectedStatusId;
+    private int searchedOrderId;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -111,9 +128,19 @@
     {
         var authState = await authenticationState;
         var user = authState.User;
-        orders = await adminService.GetOrdersList(1);
         if(user!=null)
+        {
+            orders = await adminService.GetOrdersList(user.FindFirst("Token")?.Value,selectedStatusId);
             statuses = await adminService.GetOrderStatuses(user.FindFirst("Token")?.Value);
+            if(statuses!=null)
+            {
+                statuses.Insert(0, new OrderStatusDTO
+                    {
+                        Id = 0,
+                        Title = "Все"
+                    });
+            }
+        }
 
     }
 
@@ -132,8 +159,13 @@
 
     private async Task SaveOrder()
     {
-        await adminService.UpdateOrder(editOrder);
-        await LoadData();
+        var authState = await authenticationState;
+        var user = authState.User;
+        if(user!=null)
+        {
+            await adminService.UpdateOrder(user.FindFirst("Token")?.Value, editOrder);
+            await LoadData();
+        }
 
         editOrder = null;
         StateHasChanged();
@@ -142,6 +174,34 @@
     private void CancelEdit()
     {
         editOrder = null;
+        StateHasChanged();
+    }
+
+    private async void StatusChanged(ChangeEventArgs e)
+    {
+        selectedStatusId = Convert.ToInt32(e.Value);
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private async void SearchOrder()
+    {
+        var authState = await authenticationState;
+        var user = authState.User;
+        if(user!=null)
+        {
+            orders = new();
+            OrderDTO searchedOder = await adminService.
+            GetOrder(searchedOrderId,user.FindFirst("Token")?.Value);
+            orders.Add(searchedOder);
+            StateHasChanged();
+        }
+    }
+
+    private async void ExitSearchOrder()
+    {
+        searchedOrderId = 0;
+        await LoadData();
         StateHasChanged();
     }
 }
