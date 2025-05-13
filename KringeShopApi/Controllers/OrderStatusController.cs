@@ -24,7 +24,7 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/OrderStatus
-        //[Authorize (Roles="admin")]
+        [Authorize (Roles="admin")]
         [HttpGet]
         public async Task<ActionResult<List<OrderStatusDTO>>> GetOrderStatuses()
         {
