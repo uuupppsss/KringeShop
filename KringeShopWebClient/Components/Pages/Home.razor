@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="product-list">
+            <div class="product-list" @onwheel="OnScroll">
                 @if (products is null || products.Count == 0)
                 {
                     <h3>Ничего не нашлось</h3>
@@ -93,8 +93,23 @@
     </main>
 </div> *@
 @code {
+    // ElementReference scrollElement;
+    // DotNetObjectReference selfReference;
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         selfReference = DotNetObjectReference.Create(this);
+    //         var minInterval = 500; // Only notify every 500 ms
+    //         await jsruntime.InvokeVoidAsync("onDivScroll",
+    //             scrollElement, minInterval);
+    //     }
+    // }
+
+    // public void Dispose() => selfReference?.Dispose();
+
     private string filter = string.Empty;
-    private List<ProductDTO> products = new List<ProductDTO>();
+    private List<ProductDTO> products;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -108,6 +123,7 @@
     protected override Task OnInitializedAsync() => LoadData();
     private async Task LoadData()
     {
+        if (products is null) products = new();
         await LoadMoreProducts();
         productsCount = await connectionService.GetProductsTotalCount();
         var authState = await authenticationState;
@@ -215,12 +231,13 @@
         products.AddRange(newProducts);
         loadedItemsCount += newProducts.Count;
         isLoading = false;
-        StateHasChanged(); // Обновляем состояние компонента
+        StateHasChanged(); 
     }
 
-    private void OnScroll()
+    private async void OnScroll()
     {
-        
+        await LoadMoreProducts();
+
     }
 
     
