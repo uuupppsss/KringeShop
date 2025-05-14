@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using System.Text.Json;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace KringeShopWebClient
 {
@@ -76,13 +76,13 @@ namespace KringeShopWebClient
            
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapRazorPages();
-                endpoints.MapBlazorHub(); // Убедитесь, что это добавлено
-                endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapRazorComponents<KringeShopWebClient.Components.Pages.OrdersAdmin>().AddInteractiveWebAssemblyRenderMode(); // Добавьте это
-            });
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapRazorPages();
+            //    endpoints.MapBlazorHub(); // Убедитесь, что это добавлено
+            //    endpoints.MapFallbackToPage("/_Host");
+            //    endpoints.MapRazorComponents<Components.Pages.>().AddInteractiveWebAssemblyRenderMode(); // Добавьте это
+            //});
 
             app.Run();
         }

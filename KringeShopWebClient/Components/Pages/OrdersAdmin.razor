@@ -124,7 +124,7 @@
                         Title = "Все"
                     });
             }
-            InitializeHubConnection();
+            //InitializeHubConnection();
         }
 
     }
@@ -183,5 +183,19 @@
     private async void ShowOrderToast(int order_id)
     {
         await js.ToastrSuccess($"Новый заказ #{order_id}");
+        if(selectedStatusId==1&&searchedOrderId==0)
+        {
+            await LoadData();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(!firstRender)
+        {
+            InitializeHubConnection();
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 }

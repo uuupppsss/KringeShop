@@ -134,7 +134,7 @@ namespace KringeShopWebClient.Services
         }
 
         //***
-        public async Task CreateOrder(string token,OrderDTO order)
+        public async Task<int> CreateOrder(string token,OrderDTO order)
         {
             if (token != null)
             {
@@ -144,14 +144,16 @@ namespace KringeShopWebClient.Services
                     var request = new HttpRequestMessage(HttpMethod.Post, "Orders/Create");
                     request.Content = new StringContent(json, Encoding.UTF8, "application/json");
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    await client.SendAsync(request);
+                    var responce=await client.SendAsync(request);
+                    return await responce.Content.ReadFromJsonAsync<int>();
                 }
-                catch
+                catch(Exception ex)
                 {
-                    
+                    Console.WriteLine(ex.Message);
                 }
 
             }
+            return 0;
 
         }
 

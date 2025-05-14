@@ -153,7 +153,7 @@ namespace KringeShopApi.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize (Roles = "user")]
         [HttpPost("Create")]
-        public async Task<ActionResult> PostOrder( OrderDTO sent_order)
+        public async Task<ActionResult<int>> PostOrder( OrderDTO sent_order)
         {
             int.TryParse(HttpContext.User.Claims.FirstOrDefault().Value, out int user_id);
             User user = await _context.Users.FirstOrDefaultAsync(u=>u.Id==user_id);
@@ -200,7 +200,7 @@ namespace KringeShopApi.Controllers
 
             
 
-            if (await _context.Orders.ContainsAsync(order)) return Ok();
+            if (await _context.Orders.ContainsAsync(order)) return Ok(order.Id);
             else return BadRequest("Что-то пошло не так");
         }
 

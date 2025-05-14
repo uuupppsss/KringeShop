@@ -4,8 +4,10 @@
 @using KringeShopLib.Model
 @using KringeShopWebClient.Services
 @using Microsoft.AspNetCore.SignalR.Client
+@using KringeShopWebClient.Extention
 
 @inject CustomerService customerService;
+@inject IJSRuntime js;
 
 @if(IsUser)
 {
@@ -35,11 +37,6 @@ else
 
 @code {
     private OrderDTO order;
-    protected override void OnInitialized()
-    {
-        order = new OrderDTO();
-        base.OnInitialized();
-    }
 
     private bool IsUser;
 
@@ -50,8 +47,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        order = new OrderDTO();
         var auth = await authenticationState;
-
         IsUser = auth.User.Identity.IsAuthenticated 
         && auth.User.IsInRole("user");
         InitializeHubConnection();
@@ -69,10 +66,17 @@ else
         //debug
 
         var authState = await authenticationState;
-        if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-            await customerService.CreateOrder(authState.User.FindFirst("Token")?.Value, order);
 
-        await _connection.InvokeAsync("OrderCreated",666);
+        try
+        {
+            int order_id=await customerService.CreateOrder(authState.User.FindFirst("Token")?.Value, order);
+
+            await _connection.InvokeAsync("OrderCreated", order_id);
+        }
+        catch(Exception ex)
+        {
+            await js.ToastrError(ex.Message);
+        }
     }
 
     private async void InitializeHubConnection()
@@ -80,6 +84,13 @@ else
         _connection = new HubConnectionBuilder()
                .WithUrl("http://localhost:5216/clientshub")
                .Build();
-        await _connection.StartAsync();
+        try
+        {
+            await _connection.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            await js.ToastrError(ex.Message);
+        }
     }
 }
