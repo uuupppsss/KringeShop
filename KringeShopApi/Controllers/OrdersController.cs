@@ -58,33 +58,43 @@ namespace KringeShopApi.Controllers
             return Ok(result);
         }
 
-        //[HttpGet("ByUser/{user_id}")]
-        //public async Task<ActionResult<List<OrderDTO>>> GetUserOrders(int user_id)
-        //{
-        //    var orders = await _context.Orders.Where(o => o.UserId == user_id).Include(o => o.Status).ToListAsync();
-        //    //сортировка по дате заказа
-        //    orders = orders.OrderByDescending(o => o.CreateDate).ToList();
+        [Authorize(Roles = "user")]
+        [HttpGet("ByUser/{status_id}")]
+        public async Task<ActionResult<List<OrderDTO>>> GetUserOrders(int status_id)
+        {
+            var us = HttpContext.User.Claims.FirstOrDefault();
+            int.TryParse(us.Value, out int user_id);
 
-        //    var result = new List<OrderDTO>();
-        //    foreach (var order in orders)
-        //    {
-        //        result.Add(new OrderDTO()
-        //        {
-        //            Id = order.Id,
-        //            UserId = order.UserId,
-        //            Adress = order.Adress,
-        //            FullCost = order.FullCost,
-        //            RecieveDate = order.RecieveDate,
-        //            StatusId = order.StatusId,
-        //            CreateDate = order.CreateDate,
-        //            //IsCmpleted = order.IsCmpleted,
-        //            IsSelfPickUp = order.IsSelfPickUp,
-        //            Status = order.Status.Title
-        //        });
-        //    }
+            List<Order> orders = new();
 
-        //    return Ok(result);
-        //}
+            if(status_id==1)
+            orders = await _context.Orders.Where(o => o.UserId == user_id&&o.StatusId<4).
+                    Include(o => o.Status).ToListAsync();
+            else orders = await _context.Orders.Where(o => o.UserId == user_id && o.StatusId >=4).
+                    Include(o => o.Status).ToListAsync();
+            //сортировка по дате заказа
+            orders = orders.OrderByDescending(o => o.CreateDate).ToList();
+
+            var result = new List<OrderDTO>();
+            foreach (var order in orders)
+            {
+                result.Add(new OrderDTO()
+                {
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    Adress = order.Adress,
+                    FullCost = order.FullCost,
+                    RecieveDate = order.RecieveDate,
+                    StatusId = order.StatusId,
+                    CreateDate = order.CreateDate,
+                    //IsCmpleted = order.IsCmpleted,
+                    IsSelfPickUp = order.IsSelfPickUp,
+                    Status = order.Status.Title
+                });
+            }
+
+            return Ok(result);
+        }
 
         // GET: api/Orders/5
         [Authorize (Roles ="user,admin")]
@@ -195,26 +205,23 @@ namespace KringeShopApi.Controllers
         }
 
         // DELETE: api/Orders/5
-        [Authorize(Roles = "admin")]
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteOrder(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
+        //[Authorize(Roles = "admin")]
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult> DeleteOrder(int id)
+        //{
+        //    var order = await _context.Orders.FindAsync(id);
+        //    if (order == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+        //    _context.Orders.Remove(order);
+        //    await _context.SaveChangesAsync();
 
-            if (!await _context.Orders.ContainsAsync(order)) return Ok();
-            else return BadRequest("Что-то пошло не так");
-        }
+        //    if (!await _context.Orders.ContainsAsync(order)) return Ok();
+        //    else return BadRequest("Что-то пошло не так");
+        //}
 
-        private bool OrderExists(int id)
-        {
-            return _context.Orders.Any(e => e.Id == id);
-        }
+
     }
 }

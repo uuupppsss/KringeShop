@@ -8,54 +8,64 @@
 @using KringeShopWebClient.Extention
 
 @inject AdminService adminService
+@inject ConnectionService connectionService
 @inject IJSRuntime js
-@* <AuthorizeView Roles="admin">
-    <Authorized> *@
+
 @if(isAdmin)
 {
-    <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu/>
+        </div>
+        <main class="main-content">
+            <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-        <div>
-            <label>Название:</label>
-            <InputText @bind-Value="product.Name" />
-        </div>
-        <div>
-            <label>Описание:</label>
-            <InputTextArea @bind-Value="product.Description" />
-        </div>
-        <div>
-            <label>Цена:</label>
-            <InputNumber @bind-Value="product.Price" />
-        </div>
-        <div>
-            <label>Количество:</label>
-            <InputNumber @bind-Value="product.Count" />
-        </div>
-        <div>
-            <label>Изображения: (выберите до 5 картинок)</label>
-            <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
+                <div>
+                    <label>Название:</label>
+                    <InputText @bind-Value="product.Name" />
+                </div>
+                <div>
+                    <label>Описание:</label>
+                    <InputTextArea @bind-Value="product.Description" />
+                </div>
+                <div>
+                    <label>Цена:</label>
+                    <InputNumber @bind-Value="product.Price" />
+                </div>
+                <div>
+                    <label>Количество:</label>
+                    <InputNumber @bind-Value="product.Count" />
+                </div>
+                <div>
+                    <label>Изображения: (выберите до 5 картинок)</label>
+                    <InputFile OnChange="HandleFileSelected" multiple accept=".jpg, .jpeg, .png" />
 
-        </div>
-        <div>
-            <label>Категория:</label>
-            <select @bind="selectedTypeId">
-                @if (!(types is null) && types.Count != 0)
-                {
-                    foreach (var type in types)
-                    {
-                        <option value="@type.Id">@type.Title</option>
-                    }
-                }
-            </select>
-        </div>
+                </div>
+                <div>
+                    <label>Категория:</label>
+                    <select @bind="selectedTypeId">
+                        @if (!(types is null) && types.Count != 0)
+                        {
+                            foreach (var type in types)
+                            {
+                                <option value="@type.Id">@type.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
 
-        <button type="submit">Сохранить</button>
-    </EditForm>
+                <button type="submit">Сохранить</button>
+            </EditForm>
+        </main>
+    </div>
 }
-@*  </Authorized>
-</AuthorizeView> *@
+else
+{
+    <NotAuthorizedLayout />
+}
+
       
 <style>
     .scaled-image {
@@ -78,14 +88,15 @@
 
     private async Task HandleValidSubmit()
     {
-        
+        var auth = await authenticationState;
+
         product.TypeId = selectedTypeId;
-        await adminService.AddProduct(product, productPhotos);
+        await adminService.AddProduct(auth.User.FindFirst("Token")?.Value,product, productPhotos);
     }
 
     private async Task LoadData()
     {
-        types = await adminService.GetTypesList();
+        types = await connectionService.GetTypesList();
         var auth = await authenticationState;
         var user = auth.User;
         isAdmin = user.Identity.IsAuthenticated && user.IsInRole("admin");

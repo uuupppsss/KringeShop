@@ -72,36 +72,7 @@ namespace KringeShopApi.Controllers
             return Ok(result.Count);
         }
 
-        //[HttpGet("TotalCount")]
-        //public async Task<ActionResult<int>> GetProductsTotalCount()
-        //{
-        //    return Ok(_context.Products.Count());
-        //}
-
-        // GET: api/Products/Filter/filterword
-        //[HttpGet("Filter/{filterword}")]
-        //public async Task<ActionResult<List<ProductDTO>>> GetFilteredProducts(string filterword)
-        //{
-        //    List<ProductDTO> result = new List<ProductDTO>();
-        //    List<Product> products = new();
-        //    products = await _context.Products.Where(p=>p.Name.Contains(filterword)||p.Description.Contains(filterword)).ToListAsync();
-        //    foreach (var product in products)
-        //    {
-        //        result.Add(new ProductDTO()
-        //        {
-        //            Id = product.Id,
-        //            Name = product.Name,
-        //            Description = product.Description,
-        //            TypeId = product.TypeId,
-        //            Price = product.Price,
-        //            Count = product.Count,
-        //            TimeBought = product.TimeBought
-        //        });
-        //    }
-        //    return Ok(result);
-        //}
-
-        // GET: api/Products/5
+      
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProduct(int id)
         {
@@ -124,7 +95,7 @@ namespace KringeShopApi.Controllers
                 TimeBought = product.TimeBought,
                 Images= product.ProductImages.Select(x => Convert.ToBase64String(x.Image)).ToList()
             };
-            result.CurrentImage = result.Images[0];
+            if(result.Images.Count!=0) result.CurrentImage = result.Images[0];
             return Ok(result);
         }
 
@@ -163,7 +134,7 @@ namespace KringeShopApi.Controllers
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<int>> PostProduct(ProductDTO sent_product)
         {
@@ -183,8 +154,9 @@ namespace KringeShopApi.Controllers
             else return BadRequest("Что то пошло не так");
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost("Images/{product_id}")]
-        public async Task<ActionResult> PostProductImages(int product_id, List<byte[]> images)
+        public async Task<ActionResult> UploadProductImages(int product_id, List<byte[]> images)
         {
             Product product = await _context.Products.FirstOrDefaultAsync(p => p.Id == product_id);
             if (product is null) return NotFound();
@@ -225,21 +197,5 @@ namespace KringeShopApi.Controllers
             return _context.Products.Any(e => e.Id == id);
         }
 
-        //[Authorize(Roles = "admin")]
-        //[HttpPost("Upload")]
-        //public async Task<ActionResult> UploadProductImage(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return BadRequest("No file uploaded.");
-
-        //    var filePath = Path.Combine("uploads", file.FileName);
-
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await file.CopyToAsync(stream);
-        //    }
-
-        //    return Ok(new { FilePath = filePath });
-        //}
     }
 }

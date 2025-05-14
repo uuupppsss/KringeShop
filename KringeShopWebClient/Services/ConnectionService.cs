@@ -68,5 +68,27 @@ namespace KringeShopWebClient.Services
             }
         }
 
+        public async Task<List<ProductTypeDTO>> GetTypesList()
+        {
+            try
+            {
+                var responce = await client.GetAsync("ProductTypes");
+                if (!responce.IsSuccessStatusCode)
+                {
+                    //error
+                    return null;
+                }
+                else
+                {
+                    //success
+                    return await responce.Content.ReadFromJsonAsync<List<ProductTypeDTO>>();
+                }
+            }
+            catch
+            {
+                //error
+                return null;
+            }
+        }
     }
 }

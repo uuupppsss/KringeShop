@@ -13,11 +13,12 @@ namespace KringeShopApi.Hubs
         {
             _context = context;
         }
-        public async Task ConnectAdmin(string username)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, username);
-            await Groups.AddToGroupAsync(Context.ConnectionId, "admin");
-        }
+
+        //public async Task ConnectAdmin(string username)
+        //{
+        //    await Groups.AddToGroupAsync(Context.ConnectionId, username);
+        //    await Groups.AddToGroupAsync(Context.ConnectionId, "admin");
+        //}
 
         public async Task OrderStatusChanged(int order_id)
         {

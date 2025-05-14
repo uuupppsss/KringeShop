@@ -7,7 +7,7 @@
 @using KringeShopWebClient.Model;
 
 
-@inject IJSRuntime jsruntime;
+@inject IJSRuntime js;
 @inject NavigationManager nav;
 @inject AuthService connection;
 
@@ -56,9 +56,11 @@
         nav.NavigateTo("/SignIn");
     }
 
-    private void SignUpMethod()
+    private async void SignUpMethod()
     {
         model.SignUp();
+        await js.ToastrSuccess("Регистрация прошла успешно! Выполните авторизацию");
+        await Task.Delay(2000);
         nav.NavigateTo("SignIn", true);
     }
 }

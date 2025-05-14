@@ -93,6 +93,9 @@
             </div>
         }
     </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedLayout/>
+    </NotAuthorized>
 </AuthorizeView>
 
 @code {
@@ -119,8 +122,8 @@
         order = await adminService.GetOrder(OrderId, auth.User.FindFirst("Token")?.Value);
         if(order!=null)
         {
-            orderItems = await adminService.GetOrderItems(OrderId);
-            user = await adminService.GetUserData(order.UserId);
+            orderItems = await adminService.GetOrderItems(auth.User.FindFirst("Token")?.Value,OrderId);
+            user = await adminService.GetUserData(auth.User.FindFirst("Token")?.Value,order.UserId);
             updatedStatusId = order.StatusId;
             updatedRecieveDate = order.RecieveDate;
         }

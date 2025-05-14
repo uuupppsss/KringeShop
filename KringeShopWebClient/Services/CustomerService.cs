@@ -155,7 +155,66 @@ namespace KringeShopWebClient.Services
 
         }
 
-        
+        //***
+        public async Task<List<OrderDTO>> GetUserOrders(string token, int status_id)
+        {
+            if (token != null)
+            {
+                try
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"Orders/ByUser/{status_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<List<OrderDTO>>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return null;
+        }
 
+        //***
+        public async Task<UserDTO> GetUserData(string token)
+        {
+            if (token != null)
+            {
+                try
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"Users");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<UserDTO>();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return null;
+        }
+
+        //***
+        public async Task UpdateUser(string token, UserDTO user)
+        {
+            if (token != null)
+            {
+                try
+                {
+                    string json = JsonSerializer.Serialize(user);
+                    var request = new HttpRequestMessage(HttpMethod.Put, "Users");
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    await client.SendAsync(request);
+                }
+                catch
+                {
+
+                }
+
+            }
+        }
     }
+
 }

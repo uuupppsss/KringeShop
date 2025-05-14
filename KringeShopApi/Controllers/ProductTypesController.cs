@@ -38,50 +38,8 @@ namespace KringeShopApi.Controllers
             return Ok(result);
         }
 
-        // GET: api/ProductTypes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductType>> GetProductType(int id)
-        {
-            var productType = await _context.ProductTypes.FindAsync(id);
 
-            if (productType == null)
-            {
-                return NotFound();
-            }
-
-            return productType;
-        }
-
-        // PUT: api/ProductTypes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProductType(int id, ProductType productType)
-        {
-            if (id != productType.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(productType).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
+        
 
         // POST: api/ProductTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -110,9 +68,6 @@ namespace KringeShopApi.Controllers
             return NoContent();
         }
 
-        private bool ProductTypeExists(int id)
-        {
-            return _context.ProductTypes.Any(e => e.Id == id);
-        }
+       
     }
 }

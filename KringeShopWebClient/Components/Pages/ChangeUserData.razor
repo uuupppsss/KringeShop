@@ -1,0 +1,94 @@
+﻿@page "/ChangeUserData"
+@rendermode InteractiveServer
+
+@using KringeShopWebClient.Services
+@using KringeShopLib.Model
+@using KringeShopWebClient.Components.Layout
+@using KringeShopWebClient.Extention
+@using KringeShopWebClient.Auth
+@using Microsoft.AspNetCore.Components.Server
+@using KringeShopWebClient.Model
+
+@inject CustomerService customerService;
+@inject IJSRuntime js;
+@inject NavigationManager nav;
+
+<div>
+
+    @if (IsUser)
+    {
+        @* <NavHomeLayout /> *@
+        <div>
+            <EditForm Model="@user" OnValidSubmit="SaveUserData">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div>
+                    <p>Логин</p>
+                    <InputText class="form-control" @bind-Value="@user.UserName" style="input-field"></InputText>
+
+                    <p>Почта</p>
+                    <InputText class="form-control" @bind-Value="@user.Email" style="input-field"></InputText>
+
+                    <p>Контактный телефон</p>
+                    <InputText class="form-control" @bind-Value="@user.PhoneNumber" style="input-field"></InputText>
+                </div>
+
+                <button type="submit">Сохранить</button>
+
+            </EditForm>
+            <button>Изменить пароль</button>
+            <button>Удалить аккаунт</button>
+        </div>
+    }
+    else
+    {
+        <NotAuthorizedLayout />
+    }
+</div>
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private UserInfoModel user = new UserInfoModel();
+    private bool IsUser;
+
+    private UserDTO CurrentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var auth = await authenticationState;
+
+        if (auth.User.IsInRole("user")) IsUser = true;
+        else IsUser = false;
+
+        CurrentUser = await customerService.GetUserData(auth.User.FindFirst("Token")?.Value);
+        if(CurrentUser!=null)
+        {
+            user.PhoneNumber = CurrentUser.ContactPhone;
+            user.Email = CurrentUser.Email;
+            user.UserName = CurrentUser.Username;
+        }
+    }
+
+    private async void SaveUserData()
+    {
+        var auth = await authenticationState;
+        CurrentUser.ContactPhone = user.PhoneNumber;
+        CurrentUser.Email = user.Email;
+        CurrentUser.Username = user.UserName;
+        await customerService.UpdateUser(auth.User.FindFirst("Token")?.Value, CurrentUser);
+        await js.ToastrSuccess("Данные успешно сохранены");
+        await Task.Delay(2000);
+        nav.NavigateTo("Account");
+    }
+
+    private void ChangePassword()
+    {
+        
+    }
+}

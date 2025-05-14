@@ -11,18 +11,24 @@
 {
     <div class="center-container">
         <div class="product-card">
-            
+            @if(Product.Images!=null&&Product.Images.Count!=0)
+            {
                 <div class="image-carousel">
                     <button @onclick="() => PreviousImage(Product)" class="image-btn">&#10094;</button>
-               
-                        <div class="carousel-images">
-                            @foreach (var image in Product.Images)
-                            {
-                                <img src="@($"data:image/png;base64,{image}")" style="display: @(image == Product.CurrentImage ? "block" : "none")" />
-                            }
-                        </div>
+
+                    <div class="carousel-images">
+                        @foreach (var image in Product.Images)
+                        {
+                            <img src="@($"data:image/png;base64,{image}")" style="display: @(image == Product.CurrentImage ? "block" : "none")" />
+                        }
+                    </div>
                     <button @onclick="() => NextImage(Product)" class="image-btn">&#10095;</button>
                 </div>
+            }
+            else
+            {
+                <img title="картинок пока нет" />
+            }
             
             
             <h2 class="product-title">@Product.Name</h2>

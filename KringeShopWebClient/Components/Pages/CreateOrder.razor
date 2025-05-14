@@ -3,26 +3,35 @@
 
 @using KringeShopLib.Model
 @using KringeShopWebClient.Services
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject CustomerService customerService;
 
-<EditForm Model="@order" OnValidSubmit="@HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if(IsUser)
+{
+    @* <NavHomeLayout/> *@
+    <EditForm Model="@order" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="form-group">
-        <label for="address">Адрес</label>
-        <InputText id="address" class="form-control" @bind-Value="order.Adress" />
-        <ValidationMessage For="@(() => order.Adress)" />
-    </div>
+        <div class="form-group">
+            <label for="address">Адрес</label>
+            <InputText id="address" class="form-control" @bind-Value="order.Adress" />
+            <ValidationMessage For="@(() => order.Adress)" />
+        </div>
 
-    <div class="form-group">
-        <label for="isSelfPickUp">Самовывоз</label>
-        <InputCheckbox id="isSelfPickUp" @bind-Value="order.IsSelfPickUp" />
-    </div>
+        <div class="form-group">
+            <label for="isSelfPickUp">Самовывоз</label>
+            <InputCheckbox id="isSelfPickUp" @bind-Value="order.IsSelfPickUp" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Создать заказ</button>
-</EditForm>
+        <button type="submit" class="btn btn-primary">Создать заказ</button>
+    </EditForm>
+}
+else
+{
+    <NotAuthorizedLayout/>
+}
 
 @code {
     private OrderDTO order;
@@ -32,8 +41,21 @@
         base.OnInitialized();
     }
 
+    private bool IsUser;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+
+    private HubConnection _connection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await authenticationState;
+
+        IsUser = auth.User.Identity.IsAuthenticated 
+        && auth.User.IsInRole("user");
+        InitializeHubConnection();
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -50,5 +72,14 @@
         if (!string.IsNullOrEmpty(authState.User.Identity.Name))
             await customerService.CreateOrder(authState.User.FindFirst("Token")?.Value, order);
 
+        await _connection.InvokeAsync("OrderCreated",666);
+    }
+
+    private async void InitializeHubConnection()
+    {
+        _connection = new HubConnectionBuilder()
+               .WithUrl("http://localhost:5216/clientshub")
+               .Build();
+        await _connection.StartAsync();
     }
 }

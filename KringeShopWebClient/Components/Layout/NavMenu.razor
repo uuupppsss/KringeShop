@@ -1,8 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@using System.Security.Claims;
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-@using KringeShopWebClient.Model;
-@inject AuthenticationStateProvider authP;
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -21,47 +17,21 @@
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Account">
-                <span aria-hidden="true"></span> Личный кабинет
+            <NavLink class="nav-link" href="/AddProduct">
+                <span aria-hidden="true"></span> Добавить продукт
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Basket">
-                <span aria-hidden="true"></span> Корзина
+            <NavLink class="nav-link" href="/Orders">
+                <span aria-hidden="true"></span> Заказы
             </NavLink>
         </div>
-        
-         @* <AuthorizeView Roles="admin">
-            <Authorized>  *@
-
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/AddProduct">
-                            <span aria-hidden="true"></span> Добавить продукт
-                        </NavLink>
-                    </div>
-
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/Orders">
-                            <span aria-hidden="true"></span> Заказы
-                        </NavLink>
-                    </div>
-            @*  </Authorized>
-        </AuthorizeView>  *@
+                    
         </nav>
 </div>
 @code
 {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
-    private ClaimsPrincipal authUser;
 
-    protected override Task OnInitializedAsync() => LoadData();
-
-    private async Task LoadData()
-    {
-        var authState = await authP.GetAuthenticationStateAsync();
-
-    }
 }
 

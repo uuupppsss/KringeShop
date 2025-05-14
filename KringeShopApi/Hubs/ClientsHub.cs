@@ -14,21 +14,16 @@ namespace KringeShopApi.Hubs
             _context = context;
         }
 
-        //public override Task OnConnectedAsync()
+        //private async void ConnectClient(string username)
         //{
-        //    return base.OnConnectedAsync();
+        //    //string name = Context.User.Identity.Name;
+        //    if (!string.IsNullOrEmpty(username))
+        //    {
+        //        await Groups.AddToGroupAsync(Context.ConnectionId, username);
+        //    }
+        //    await Groups.AddToGroupAsync(Context.ConnectionId, "user");
+
         //}
-
-        private async void ConnectClient(string username)
-        {
-            //string name = Context.User.Identity.Name;
-            if (!string.IsNullOrEmpty(username))
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, username);
-            }
-            await Groups.AddToGroupAsync(Context.ConnectionId, "user");
-
-        }
 
         public async Task NewClientSignedUp()
         {
@@ -37,7 +32,7 @@ namespace KringeShopApi.Hubs
 
         public async Task OrderCreated(int order_id)
         {
-            await Clients.All.SendAsync("Ordercreated", order_id);
+            await Clients.All.SendAsync("OrderCreated", order_id);
         }
 
     }

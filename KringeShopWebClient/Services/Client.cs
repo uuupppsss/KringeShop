@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.SignalR.Client;
 using System.Net.Http.Headers;
 
 namespace KringeShopWebClient.Services
@@ -19,10 +20,30 @@ namespace KringeShopWebClient.Services
             }
         }
 
-        //public static void SetToken(string token)
+        //private static HubConnection _userHubConnection;
+        //public static HubConnection UserHubConnection
         //{
-        //    _httpClient.DefaultRequestHeaders.Authorization =
-        //    new AuthenticationHeaderValue("Bearer", token);
+        //    get
+        //    {
+        //        if(_userHubConnection == null)
+        //            _userHubConnection = new HubConnectionBuilder()
+        //        .WithUrl("http://localhost:5216/")
+        //        .Build();
+        //        return _userHubConnection;
+        //    }
+        //}
+
+        //private static HubConnection _adminHubConnection;
+        //public static HubConnection AdminHubConnection
+        //{
+        //    get
+        //    {
+        //        if (_adminHubConnection == null)
+        //            _adminHubConnection = new HubConnectionBuilder()
+        //        .WithUrl("http://localhost:5216/")
+        //        .Build();
+        //        return _adminHubConnection;
+        //    }
         //}
     }
 }

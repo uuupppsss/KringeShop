@@ -1,6 +1,27 @@
-﻿
-<p>Error 404</p>
-<p>Not found</p>
-@code {
+﻿@inject NavigationManager nav;
 
+<AuthorizeView Roles="user">
+    <Authorized>
+        <p>Страница не найдена :(</p>
+    </Authorized>
+    <NotAuthorized>
+        <div class="center-container">
+            <div class="auth-container">
+                <button @onclick="SignIn">Войти</button>
+                <p>Ещё нет аккаунта?</p>
+                <button @onclick="SignUp">Зарегистрироваться</button>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private void SignIn()
+    {
+        nav.NavigateTo("SignIn");
+    }
+
+    private void SignUp()
+    {
+        nav.NavigateTo("SignUp");
+    }
 }

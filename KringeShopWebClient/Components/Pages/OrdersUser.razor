@@ -1,5 +1,92 @@
 ﻿@page "/UserOrders"
+@rendermode InteractiveServer
+
+@using KringeShopLib.Model
+@using KringeShopWebClient.Services
+
+@inject CustomerService customerService;
+
+<AuthorizeView Roles="user">
+    <Authorized>
+        @* <NavHomeLayout/> *@
+        <select @onchange="StatusChanged">
+            @if (!(statuses is null) && statuses.Count != 0)
+            {
+                foreach (var status in statuses)
+                {
+                    <option value="@status.Id">@status.Title</option>
+                }
+            }
+        </select>
+        @if (orders == null)
+        {
+            <p><em>Загрузка...</em></p>
+        }
+        else if (orders.Count == 0)
+        {
+            <p><em>Нет заказов.</em></p>
+        }
+        else
+        {
+            <div class="row">
+                
+                @foreach (var order in orders)
+                {
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Заказ# @order.Id</h5>
+                                <p class="card-text"><strong>Адрес:</strong> @order.Adress</p>
+                                <p class="card-text"><strong>Полная стоимость:</strong> @order.FullCost</p>
+                                <p class="card-text"><strong>Дата получения:</strong> @order.RecieveDate?.ToString("dd/MM/yyyy")</p>
+                                <p class="card-text"><strong>Статус:</strong> @order.Status</p>
+                                <p class="card-text"><strong>Дата создания:</strong> @order.CreateDate?.ToString("dd/MM/yyyy")</p>
+                                <p class="card-text"><strong>Завершен:</strong> @(order.IsCmpleted ? "Да" : "Нет")</p>
+                                <p class="card-text"><strong>Самовывоз:</strong> @(order.IsSelfPickUp ? "Да" : "Нет")</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedLayout/>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
+    private List<OrderDTO> orders;
+    private List<OrderStatusDTO> statuses;
+    private int selectedStatusId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedStatusId = 1;
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var auth = await authenticationState;
+
+        statuses = new List<OrderStatusDTO>
+        {
+            new OrderStatusDTO{Id=1,Title="Актуальные"},
+            new OrderStatusDTO{Id=2,Title="Завершенные" }
+        };
+
+        orders = await customerService.
+        GetUserOrders(auth.User.FindFirst("Token")?.Value, selectedStatusId);
+    }
+
+    private async void StatusChanged(ChangeEventArgs e)
+    {
+        selectedStatusId = Convert.ToInt32(e.Value);
+        await LoadData();
+        StateHasChanged();
+    }
 }

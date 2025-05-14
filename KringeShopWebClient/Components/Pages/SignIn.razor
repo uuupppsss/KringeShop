@@ -11,7 +11,7 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Server
 
-@inject IJSRuntime jsruntime;
+@inject IJSRuntime js;
 @inject NavigationManager nav;
 @inject AuthService authService;
 @inject AuthenticationStateProvider authStateProvider;
@@ -53,7 +53,7 @@
         ResponseTokenAndStuff response = await authService.SignIn(username, pwd);
         if (response is null)
         {
-            await jsruntime.ToastrError("Что-то пошло не так");
+            await js.ToastrError("Что-то пошло не так");
             return;
         }
 
@@ -69,6 +69,8 @@
         var customAuthStateProvider = authStateProvider as ServerAuthenticationStateProvider;
         customAuthStateProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(prinsipal)));
 
+        await js.ToastrSuccess("Авторизация прошла успешно");
+        await Task.Delay(2000);
         nav.NavigateTo("/");
     }
 }

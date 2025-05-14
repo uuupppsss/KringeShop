@@ -7,73 +7,75 @@
 @using KringeShopWebClient.Extention
 @using KringeShopWebClient.Auth
 @using Microsoft.AspNetCore.Components.Server
+@using KringeShopWebClient.Model
 
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager nav;
-@inject UserService userSerice;
+@inject CustomerService customerSerice;
 @inject IJSRuntime js;
 
-<h3>Личный кабинет</h3>
+<style>
+    .account-container {
+        display: flex; 
+        justify-content: space-between; 
+        padding: 20px; 
+        background-color: #f8f0f2; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    }
 
-    <AuthorizeView Roles="user,admin">
-        <Authorized>
-        <div class="center-container">
-            <div class="auth-container">
-                @if(CurrentUser!=null)
+    .user-info {
+        flex: 1; 
+        margin-right: 20px; 
+        display: flex;
+        flex-direction: column; 
+        text-align: left;
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column; 
+    }
+    button{
+        margin-top: 10px;
+    }
+</style>
+@if(IsUser)
+{
+    @* <NavHomeLayout/> *@
+    <h3>Личный кабинет</h3>
+
+    <div class="account-container">
+        @if (CurrentUser != null)
+        {
+            <div class="user-info">
+                @if (!userDataChange)
                 {
-                    if(!userDataChange)
-                    {
-                        <h5>Имя пользователя</h5>
-                        <p>@CurrentUser.Username</p>
-                        <h5>Электронная почта</h5>
-                        <p>@CurrentUser.Email</p>
-                        <h5>Контактный телефон</h5>
-                        <p>@CurrentUser.ContactPhone</p>
-                        <p></p>
-                        <button style="margin-top:10px" @onclick="UpdateUser">Изменить данные</button>
-                        <button style="margin-top:10px" @onclick="SignOut">Выйти из аккаунта</button>
-                        <button style="margin-top:10px" @onclick="RemoveAccount">Удалить аккаунт</button>
-                        <button style="margin-top:10px" @onclick="UpdatePassword">Изменить пароль</button>
-                    }
-                    else 
-                    {
-
-                            <h5>Имя пользователя</h5>
-                            <input type="text" @bind-value="@CurrentUser.Username" />
-                            <h5>Электронная почта</h5>
-                            <input type="text" @bind-value="@CurrentUser.Email" />
-                            <h5>Контактный телефон</h5>
-                            <input type="text" @bind-value="@CurrentUser.ContactPhone" />
-                            <button style="margin-top:10px" @onclick="SaveUserData">Сохранить</button>
-
-                        
-                    }
-                    if (passwordChange)
-                    {
-                        <h5>Старый пароль</h5>
-                        <input type="password" @bind-value="@oldPwd" />
-                        <h5>Новый пароль</h5>
-                        <input type="password" @bind-value="@newPwd" />
-                        <h5>Повторите пароль</h5>
-                        <input type="password" @bind-value="@repeatPwd" />
-                        <button style="margin-top:10px" @onclick="SavePassword"> Сохранить</button>
-                    }
+                    <h5>Имя пользователя</h5>
+                    <p>@CurrentUser.Username</p>
+                    <h5>Электронная почта</h5>
+                    <p>@CurrentUser.Email</p>
+                    <h5>Контактный телефон</h5>
+                    <p>@CurrentUser.ContactPhone</p>
                 }
-
+                else
+                {
+                    
+                }
             </div>
+        }
+        <div class="button-group">
+            <button @onclick="UpdateUser" >Изменить данные</button>
+            <button @onclick="SignOut">Выйти из аккаунта</button>
+            <button @onclick="ViewOrders">Заказы</button>
         </div>
-        </Authorized>
-        <NotAuthorized>
-            <div class="center-container">
-                <div class="auth-container">
-                    <button @onclick="SignIn">Войти</button>
-                    <p>Ещё нет аккаунта?</p>
-                    <button @onclick="SignUp">Зарегистрироваться</button>
-                </div>
-            </div>
-        </NotAuthorized>
-    </AuthorizeView>
-    
+    </div>
+}
+else
+{
+    <NotAuthorizedLayout />
+}
+
 
 @code {
     private bool passwordChange=false;
@@ -85,6 +87,9 @@
 
     private UserDTO CurrentUser;
 
+
+    private bool IsUser;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
@@ -94,60 +99,29 @@
     {
         var authState = await authenticationState;
         if (!string.IsNullOrEmpty(authState.User.Identity.Name))
-            CurrentUser = await userSerice.GetUserData(authState.User.Identity.Name);
+        {
+            CurrentUser = await customerSerice.GetUserData(authState.User.FindFirst("Token")?.Value);
+
+        }
+        if (authState.User.IsInRole("user")) IsUser = true;
+        else IsUser = false;
+
     }
 
-    private void SignIn()
+    private void SignOut()
     {
-        nav.NavigateTo("SignIn");
-    }
-
-    private void SignUp()
-    {
-        nav.NavigateTo("SignUp");
-    }
-
-    private async void SignOut()
-    {
-        // var customAuthStateProvider = authStateProvider as CustomAuthenticationStateProvider;
-        // await customAuthStateProvider.UpdateAuthenticationState(null);
-
         var customAuthStateProvider = authStateProvider as ServerAuthenticationStateProvider;
         customAuthStateProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(new System.Security.Claims.ClaimsPrincipal())));
         nav.NavigateTo("/", true);
     }
 
-    private void RemoveAccount()
+    private void ViewOrders()
     {
-
+        nav.NavigateTo("/UserOrders");
     }
 
     private void UpdateUser()
     {
-        userDataChange = true;
-        StateHasChanged();
-    }
-    private void UpdatePassword()
-    {
-        passwordChange=true;
-        StateHasChanged();
-    }
-
-
-    private void SavePassword()
-    {
-        passwordChange = false;
-        StateHasChanged();
-    }
-    private async void SaveUserData()
-    {
-        bool result = await userSerice.UpdateUser(CurrentUser);
-        if (result)
-        {
-            await LoadData();
-            userDataChange = false;
-            StateHasChanged();
-        }
-        else await js.ToastrError("Ошибка сохранения данных");
+        nav.NavigateTo("/ChangeUserData");
     }
 }

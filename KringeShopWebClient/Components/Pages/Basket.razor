@@ -11,6 +11,7 @@
 <h3>Корзина товаров</h3>
 <AuthorizeView Roles="user">
     <Authorized>
+        @* <NavHomeLayout/> *@
         @if(basketItems!=null)
         {
             if(basketItems.Count!=0)
@@ -40,14 +41,7 @@
     </Authorized>
 
     <NotAuthorized>
-        <div class="center-container">
-            <div class="auth-container">
-                <p>Для перехода в корзину товаров необходимо войти в учётную запись</p>
-                <button @onclick="SignIn">Войти</button>
-                <p>Ещё нет аккаунта?</p>
-                <button @onclick="SignUp">Зарегистрироваться</button>
-            </div>
-        </div>
+        <NotAuthorizedLayout/>
     </NotAuthorized>
 </AuthorizeView>
 @code
@@ -64,16 +58,6 @@
         var authState = await authenticationState;
         if (!string.IsNullOrEmpty(authState.User.FindFirst("Token")?.Value))
             basketItems = await customerService.GetUserBasket(authState.User.FindFirst("Token")?.Value);
-    }
-
-    private void SignUp()
-    {
-        nav.NavigateTo("/SignUp");
-    }
-
-    private void SignIn()
-    {
-        nav.NavigateTo("/SignIn");
     }
 
     private async void DeleteBasketItem(int id)

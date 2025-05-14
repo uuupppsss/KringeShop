@@ -15,60 +15,41 @@ namespace KringeShopWebClient.Services
             client = Client.HttpClient;
         }
        
-        public async Task AddProduct(ProductDTO product, List<byte[]> images)
+        public async Task AddProduct(string token, ProductDTO product, List<byte[]> images)
         {
             
-            try
-            {
-                int addedProductId=0;
+           if(token!=null)
+           {
+                HttpResponseMessage responce=null;
+                int addedProductId = 0;
                 string json = JsonSerializer.Serialize(product);
-                var responce = await client.PostAsync("Products", new StringContent(json, Encoding.UTF8, "application/json"));
-                if (!responce.IsSuccessStatusCode)
+                var request = new HttpRequestMessage(HttpMethod.Post, "Products/");
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                try
                 {
-                  //ошибка
+                    responce=await client.SendAsync(request);
                 }
-                else
+                catch(Exception ex) 
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                if(responce!=null&&responce.IsSuccessStatusCode)
                 {
                     addedProductId = await responce.Content.ReadFromJsonAsync<int>();
                     string images_json = JsonSerializer.Serialize(images);
-                    var images_responce = await client.PostAsync($"Products/Images/{addedProductId}", new StringContent(images_json, Encoding.UTF8, "application/json"));
-                    if (!images_responce.IsSuccessStatusCode)
-                    {
-                        string error= await images_responce.Content.ReadAsStringAsync();
-                        //ошибка
-                    }
-                    else
-                    {
-                        //успех
-                    }
+                    var request2 = new HttpRequestMessage(HttpMethod.Post, $"Products/Images/{addedProductId}");
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
-            }
-            catch
-            {
-
-            }
-        }
-
-        public async Task<List<ProductTypeDTO>> GetTypesList()
-        {
-            try
-            {
-                var responce = await client.GetAsync("ProductTypes");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    //error
-                    return null;
+                    await client.SendAsync(request);
                 }
-                else
+                catch (Exception ex)
                 {
-                    //success
-                    return await responce.Content.ReadFromJsonAsync<List<ProductTypeDTO>>();
+                    Console.WriteLine(ex.Message);
                 }
-            }
-            catch
-            {
-                //error
-                return null;
             }
         }
 
@@ -131,40 +112,48 @@ namespace KringeShopWebClient.Services
             return null;
         }
         
-        public async Task<List<OrderItemDTO>> GetOrderItems(int order_id)
+        public async Task<List<OrderItemDTO>> GetOrderItems(string token, int order_id)
         {
-            try
+            if (token != null)
             {
+                try
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"OrderItems/{order_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<List<OrderItemDTO>>();
 
-                return await client.GetFromJsonAsync<List<OrderItemDTO>>($"OrderItems/{order_id}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+
+                }
             }
-            catch
-            {
-                //ошибка
-                return null;
-            }
+            return null;
 
 
         }
 
-        public async Task<UserDTO> GetUserData(int user_id)
+        public async Task<UserDTO> GetUserData(string token, int user_id)
         {
-            try
+            if (token != null)
             {
-                var responce = await client.GetAsync($"Users/ById/{user_id}");
-                if (!responce.IsSuccessStatusCode)
+                try
                 {
-                    return null;
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"Users/ById/{user_id}");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = await client.SendAsync(request);
+                    return await response.Content.ReadFromJsonAsync<UserDTO>();
+
                 }
-                else
+                catch (Exception ex)
                 {
-                    return await responce.Content.ReadFromJsonAsync<UserDTO>();
+                    Console.WriteLine(ex.Message);
+
                 }
             }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return null;
         }
 
         public async Task UpdateOrder(string token, OrderDTO order)

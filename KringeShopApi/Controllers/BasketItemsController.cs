@@ -107,6 +107,7 @@ namespace KringeShopApi.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "user")]
         // POST: api/BasketItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -152,11 +153,6 @@ namespace KringeShopApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
-        }
-
-        private bool BasketItemExists(int id)
-        {
-            return _context.BasketItems.Any(e => e.Id == id);
         }
 
         [Authorize (Roles ="user")]

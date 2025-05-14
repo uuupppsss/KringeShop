@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace KringeShopWebClient
 {
@@ -18,6 +19,7 @@ namespace KringeShopWebClient
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+            
             //builder.Services.AddAuthenticationCore();
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -51,7 +53,7 @@ namespace KringeShopWebClient
             //синглтоны
             builder.Services.AddSingleton<ConnectionService>();
             builder.Services.AddSingleton<AuthService>();
-            builder.Services.AddSingleton<UserService>();
+            //builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<CustomerService>();
             builder.Services.AddSingleton<AdminService>();
 
@@ -64,7 +66,6 @@ namespace KringeShopWebClient
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
@@ -75,6 +76,13 @@ namespace KringeShopWebClient
            
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapBlazorHub(); // Убедитесь, что это добавлено
+                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapRazorComponents<KringeShopWebClient.Components.Pages.OrdersAdmin>().AddInteractiveWebAssemblyRenderMode(); // Добавьте это
+            });
 
             app.Run();
         }

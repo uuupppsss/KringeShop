@@ -27,32 +27,36 @@ namespace KringeShopApi.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<List<UserDTO>>> GetUsers()
-        {
-            List<User> users = await _context.Users.ToListAsync();
-            if (users is null || users.Count == 0) return NotFound();
-            List<UserDTO> result = new List<UserDTO>();
-            foreach (var user in users)
-            {
-                result.Add(new UserDTO()
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Password = user.Password,
-                    Email = user.Email,
-                    ContactPhone = user.ContactPhone,
-                    RoleId = user.RoleId,
-                });
-            }
-            return Ok(result);
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<List<UserDTO>>> GetUsers()
+        //{
+        //    List<User> users = await _context.Users.ToListAsync();
+        //    if (users is null || users.Count == 0) return NotFound();
+        //    List<UserDTO> result = new List<UserDTO>();
+        //    foreach (var user in users)
+        //    {
+        //        result.Add(new UserDTO()
+        //        {
+        //            Id = user.Id,
+        //            Username = user.Username,
+        //            Password = user.Password,
+        //            Email = user.Email,
+        //            ContactPhone = user.ContactPhone,
+        //            RoleId = user.RoleId,
+        //        });
+        //    }
+        //    return Ok(result);
+        //}
 
         // GET: api/Users/username
-        [HttpGet("{username}")]
-        public async Task<ActionResult<UserDTO>> GetUser(string username)
+
+        [Authorize (Roles ="user")]
+        [HttpGet]
+        public async Task<ActionResult<UserDTO>> GetUser()
         {
-            User user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            var us=HttpContext.User.Claims.FirstOrDefault();
+            int.TryParse(us.Value, out int user_id);
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == user_id);
             if (user == null)
             {
                 return NotFound();
@@ -71,6 +75,7 @@ namespace KringeShopApi.Controllers
             return Ok(result);
         }
 
+        [Authorize (Roles ="admin")]
         [HttpGet("ById/{user_id}")]
         public async Task<ActionResult<UserDTO>> GetUserData(int user_id)
         {
@@ -79,7 +84,7 @@ namespace KringeShopApi.Controllers
             {
                 return NotFound();
             }
-
+            if (user.RoleId !=1) return BadRequest(user);
             UserDTO result = new UserDTO()
             {
                 Id = user.Id,
@@ -95,6 +100,7 @@ namespace KringeShopApi.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles ="user")]
         [HttpPut]
         public async Task<ActionResult> UpdateUser(UserDTO sent_user)
         {
@@ -146,11 +152,6 @@ namespace KringeShopApi.Controllers
 
             if (!await _context.Users.ContainsAsync(user)) return Ok();
             else return BadRequest("Что-то пошло не так");
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
         }
 
     }
